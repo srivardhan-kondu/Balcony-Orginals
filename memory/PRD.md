@@ -27,6 +27,7 @@ User uploaded a complete Website Development & Product Vision Brief (v2, Aug 202
 - Signature 3D (v2): FilmRing — draggable CSS-3D cylindrical carousel of featured project stills (auto-rotate + pointer drag + inertia), click panel to open project
 - Ring feel (v3): friction/fling momentum physics (heavy drag, glide release, cruise settle) + procedural reel-whir via Web Audio (brown noise → bandpass, pitch/volume track spin speed, LFO tape flutter), off by default, toggle button `film-ring-sound-toggle`, no autoplay
 - Cinema 3D & scroll system (v4): CineCamera — procedural chrome 35mm cinema camera (body, magazine, twin spoked spinning reels, lens, viewfinder horn) floating in Films section, scroll-drift rotation, IO-gated rendering; FilmRibbon — 3D waving 35mm film-strip ribbon (CanvasTexture sprockets/frames, scroll rolls the film via texture offset + vertex wave) as full-width divider; FootageCounter — fixed camera-HUD "FTG/FR/24FPS" counter ticking with scroll (bottom-right); HeroMark rotation is scroll-linked; all canvases IntersectionObserver-gated, reduced-motion renders one static frame
+- Page transitions (v5): ClapperTransition — every route change wipes in a 3D clapperboard (CSS perspective, hinged striped arm snaps shut with a board shake), slate reads SCENE (page name) / TAKE (increments per navigation) / 24 FPS / date, then lifts to reveal the new page; ~1.5s total, timers cleaned up on rapid navigation
 
 ## Implemented (2026-08-14, v2)
 - Full site: all 9 routes, seeded CMS-like project data in MongoDB

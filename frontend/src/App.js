@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Intro } from "@/components/Intro";
 import { FootageCounter } from "@/components/FootageCounter";
+import { ClapperTransition } from "@/components/ClapperTransition";
 import Home from "@/pages/Home";
 import Works from "@/pages/Works";
 import ProjectDetail from "@/pages/ProjectDetail";
@@ -65,6 +66,7 @@ function App() {
         </main>
         <Footer />
         <FootageCounter />
+        <ClapperTransition />
         <Toaster theme="dark" position="bottom-right" />
       </BrowserRouter>
     </div>

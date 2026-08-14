@@ -89,6 +89,61 @@ html.lenis, html.lenis body { height: auto; }
 
 .bo-hero-video { animation: bo-float 9s ease-in-out infinite; }
 
+/* Clapperboard page transition */
+.bo-take {
+    position: fixed;
+    inset: 0;
+    z-index: 160;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #050505;
+    transform: translateY(102%);
+    transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.bo-take[data-phase="in"],
+.bo-take[data-phase="snap"] {
+    transform: translateY(0);
+}
+.bo-take[data-phase="out"] {
+    transform: translateY(-102%);
+}
+.bo-clap {
+    width: min(360px, 74vw);
+    transform: perspective(900px) rotateX(10deg) rotateZ(-3deg);
+    transform-style: preserve-3d;
+}
+.bo-clap-arm {
+    height: clamp(30px, 4.5vw, 40px);
+    background: repeating-linear-gradient(-48deg, #ececeb 0 24px, #101010 24px 48px);
+    border: 1px solid #2a2a2a;
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    transform-origin: bottom left;
+    transform: rotateX(-74deg);
+    transition: transform 0.26s cubic-bezier(0.65, 0, 0.35, 1);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+.bo-take[data-phase="snap"] .bo-clap-arm,
+.bo-take[data-phase="out"] .bo-clap-arm {
+    transform: rotateX(0deg);
+}
+.bo-take[data-phase="snap"] .bo-clap {
+    animation: bo-clap-shake 0.32s ease 0.24s;
+}
+@keyframes bo-clap-shake {
+    0% { transform: perspective(900px) rotateX(10deg) rotateZ(-3deg); }
+    40% { transform: perspective(900px) rotateX(6deg) rotateZ(-2deg) translateY(4px); }
+    100% { transform: perspective(900px) rotateX(10deg) rotateZ(-3deg); }
+}
+.bo-clap-body {
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 0 0 4px 4px;
+    padding: 16px 20px 18px;
+    box-shadow: 0 34px 90px rgba(0, 0, 0, 0.65);
+}
+
 .bo-marquee { animation: bo-marquee 48s linear infinite; }
 .bo-prog { animation: bo-prog 9.5s linear forwards; }
 .bo-scroll-line { animation: bo-scroll-line 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
