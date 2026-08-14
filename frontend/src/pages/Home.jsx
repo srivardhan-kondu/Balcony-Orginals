@@ -7,6 +7,8 @@ import { WebGLHero } from "@/components/WebGLHero";
 import { HeroMark } from "@/components/HeroMark";
 import { Reveal, MaskLines, EASE } from "@/components/Motion";
 import { FilmRing } from "@/components/FilmRing";
+import { CineCamera } from "@/components/CineCamera";
+import { FilmRibbon } from "@/components/FilmRibbon";
 import { Marquee } from "@/components/Marquee";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
@@ -301,8 +303,9 @@ export default function Home() {
       </section>
 
       {/* ————— FEATURE FILMS ————— */}
-      <section data-testid="films-section" className="border-t border-line py-[clamp(80px,12vh,150px)]">
-        <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+      <section data-testid="films-section" className="relative overflow-hidden border-t border-line py-[clamp(80px,12vh,150px)]">
+        <CineCamera className="pointer-events-none absolute right-[3%] top-[2%] z-0 hidden h-[420px] w-[420px] lg:block" />
+        <div className="relative z-[2] mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>
               <Overline testid="films-overline">Feature films</Overline>
@@ -330,6 +333,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <FilmRibbon />
 
       {/* ————— UPCOMING ————— */}
       <section data-testid="upcoming-section" className="border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">

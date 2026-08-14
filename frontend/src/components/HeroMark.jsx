@@ -114,7 +114,8 @@ export const HeroMark = ({ className = "" }) => {
     const clock = new THREE.Clock();
     const tick = () => {
       const t = clock.getElapsedTime();
-      group.rotation.y += (Math.sin(t * 0.3) * 0.35 + mouse.x * 0.35 - group.rotation.y) * 0.05;
+      const sc = (window.scrollY || 0) * 0.0011;
+      group.rotation.y += (Math.sin(t * 0.3) * 0.35 + mouse.x * 0.35 + sc - group.rotation.y) * 0.05;
       group.rotation.x += (Math.sin(t * 0.45) * 0.06 - mouse.y * 0.18 - group.rotation.x) * 0.05;
       group.position.y = Math.sin(t * 0.8) * 0.08;
       reelGroups.forEach((r, i) => {
