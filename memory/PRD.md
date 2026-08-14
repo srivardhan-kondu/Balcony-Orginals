@@ -23,7 +23,7 @@ User uploaded a complete Website Development & Product Vision Brief (v2, Aug 202
 - Fonts: Archivo ExtraBold uppercase for display headlines (Sony-style), Marcellus serif for editorial quotes, Noto Serif Telugu accents, JetBrains Mono for technical
 - Motifs: film grain overlay, viewfinder corner ticks, mono metadata, masked headline reveals, editorial marquee (Telugu + English), white ember/light-shaft WebGL ambience
 - Intro: skippable brand video intro (ESC/button), once per session via sessionStorage key `bo-intro-seen`
-- Hero (v2): brand 3D logo-assembly video (balcony-intro.mp4, invert+screen blend) playing over WebGL ember field, bold kinetic masked headline
+- Hero (v3): video of the 3D logo assembly plays once, then hands off (guaranteed 9.5s fallback) to HeroMark — a LIVE chrome-metallic 3D "B" rebuilt procedurally in Three.js (extruded shape, beveled, RoomEnvironment reflections, orbiting key light), with spinning spoked film-reel rings in its counters, float + mouse-tilt reactive
 - Signature 3D (v2): FilmRing — draggable CSS-3D cylindrical carousel of featured project stills (auto-rotate + pointer drag + inertia), click panel to open project
 - Ring feel (v3): friction/fling momentum physics (heavy drag, glide release, cruise settle) + procedural reel-whir via Web Audio (brown noise → bandpass, pitch/volume track spin speed, LFO tape flutter), off by default, toggle button `film-ring-sound-toggle`, no autoplay
 

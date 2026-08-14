@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { api, UPCOMING_STATUSES } from "@/lib/api";
 import { WebGLHero } from "@/components/WebGLHero";
+import { HeroMark } from "@/components/HeroMark";
 import { Reveal, MaskLines, EASE } from "@/components/Motion";
 import { FilmRing } from "@/components/FilmRing";
 import { Marquee } from "@/components/Marquee";
@@ -54,6 +55,8 @@ const SectionLink = ({ to, children, testid }) => (
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [reelOpen, setReelOpen] = useState(false);
+  const [brandVideoDone, setBrandVideoDone] = useState(false);
+  const brandVidRef = useRef(null);
   const gemsRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: gemsRef, offset: ["start end", "end start"] });
   const gemsY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
@@ -61,6 +64,14 @@ export default function Home() {
   useEffect(() => {
     document.title = "Balcony Originals — Stories rooted in culture. Told for the world.";
     api.projects().then(setProjects).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const v = brandVidRef.current;
+    if (v) v.play().catch(() => {});
+    // guaranteed handoff to the live 3D mark even if the video stalls or never buffers
+    const t = setTimeout(() => setBrandVideoDone(true), 9500);
+    return () => clearTimeout(t);
   }, []);
 
   const featured = projects.filter((p) => p.featured);
@@ -74,27 +85,45 @@ export default function Home() {
       <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
         <WebGLHero className="absolute inset-0" />
 
-        {/* Brand animation — the 3D film-reel "B" assembling, held on its final frame */}
+        {/* Brand moment — the video assembles the mark, then hands off to a live metallic 3D "B" with spinning film reels */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.8, delay: 0.15, ease: EASE }}
-          className="pointer-events-none absolute inset-0 flex items-start justify-center pt-[13vh] md:items-center md:justify-end md:pr-[2vw] md:pt-0"
+          className="pointer-events-none absolute inset-0 flex items-start justify-center pt-[12vh] md:items-center md:justify-end md:pr-[3vw] md:pt-0"
         >
-          <video
-            src="/assets/balcony-intro.mp4"
-            poster="/assets/intro-poster.jpg"
-            autoPlay
-            muted
-            playsInline
-            preload="auto"
-            data-testid="hero-brand-video"
-            className="bo-hero-video w-[min(86vw,440px)] opacity-95 md:w-[min(44vw,680px)]"
-            style={{ filter: "invert(1) brightness(.98) contrast(1.9)", mixBlendMode: "screen" }}
-          />
+          <div className="relative aspect-square w-[min(86vw,440px)] md:w-[min(44vw,640px)]">
+            <HeroMark className="absolute inset-0" />
+            <div
+              aria-hidden="true"
+              className="absolute left-1/2 top-[78%] h-16 w-[70%] -translate-x-1/2 rounded-[100%] bg-bone/[0.06] blur-2xl"
+            />
+            <video
+              ref={brandVidRef}
+              src="/assets/balcony-intro.mp4"
+              poster="/assets/intro-poster.jpg"
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              onEnded={() => setBrandVideoDone(true)}
+              onError={() => setBrandVideoDone(true)}
+              data-testid="hero-brand-video"
+              className="bo-hero-video absolute inset-0 h-full w-full object-contain transition-opacity duration-[1400ms]"
+              style={{
+                filter: "invert(1) brightness(.98) contrast(1.9)",
+                mixBlendMode: "screen",
+                opacity: brandVideoDone ? 0 : 0.95,
+              }}
+            />
+          </div>
         </motion.div>
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)" }}
+        />
 
         <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-bone/25" />
         <span aria-hidden="true" className="absolute right-[26px] top-[96px] h-9 w-9 border-r border-t border-bone/25" />
