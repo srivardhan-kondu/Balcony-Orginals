@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
 
 export const FilmRing = ({ projects = [] }) => {
@@ -12,6 +13,9 @@ export const FilmRing = ({ projects = [] }) => {
   const dragging = useRef(false);
   const lastX = useRef(0);
   const moved = useRef(0);
+  const [soundOn, setSoundOn] = useState(false);
+  const soundRef = useRef(false);
+  const audioRef = useRef(null);
   const [radius, setRadius] = useState(520);
   const radiusRef = useRef(520);
   radiusRef.current = radius;
@@ -28,15 +32,31 @@ export const FilmRing = ({ projects = [] }) => {
     const tick = () => {
       if (!dragging.current) {
         rot.current += vel.current;
-        vel.current += (0.1 - vel.current) * 0.03;
+        // friction, then settle into a slow cruise — weighty glide
+        vel.current *= 0.965;
+        vel.current += (0.09 - vel.current) * 0.008;
       }
       if (ringRef.current) {
         ringRef.current.style.transform = `translate(-50%, -50%) translateZ(${-radiusRef.current}px) rotateX(-4deg) rotateY(${rot.current}deg)`;
       }
+      const a = audioRef.current;
+      if (a) {
+        const speed = Math.min(Math.abs(vel.current), 5);
+        const target = soundRef.current ? Math.min(speed * 0.05, 0.16) : 0;
+        a.gain.gain.setTargetAtTime(target, a.ctx.currentTime, 0.12);
+        a.bp.frequency.setTargetAtTime(380 + speed * 260, a.ctx.currentTime, 0.2);
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      const a = audioRef.current;
+      if (a) {
+        a.ctx.close().catch(() => {});
+        audioRef.current = null;
+      }
+    };
   }, []);
 
   const down = (e) => {
@@ -49,12 +69,61 @@ export const FilmRing = ({ projects = [] }) => {
     if (!dragging.current) return;
     const dx = e.clientX - lastX.current;
     lastX.current = e.clientX;
-    rot.current += dx * 0.22;
-    vel.current = dx * 0.05;
+    rot.current += dx * 0.16;
+    vel.current = Math.max(-6, Math.min(6, vel.current * 0.5 + dx * 0.05));
     moved.current += Math.abs(dx);
   };
   const up = () => {
     dragging.current = false;
+  };
+
+  const ensureAudio = () => {
+    if (audioRef.current) return audioRef.current;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    const ctx = new AC();
+    const len = ctx.sampleRate * 2;
+    const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const white = Math.random() * 2 - 1;
+      last = (last + 0.02 * white) / 1.02;
+      data[i] = last * 3.2;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    src.loop = true;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 480;
+    bp.Q.value = 1.1;
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    src.connect(bp).connect(gain).connect(ctx.destination);
+    src.start();
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = 7;
+    lfoGain.gain.value = 0.05;
+    lfo.connect(lfoGain).connect(src.playbackRate);
+    lfo.start();
+    audioRef.current = { ctx, gain, bp };
+    return audioRef.current;
+  };
+
+  const toggleSound = async () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    soundRef.current = next;
+    if (next) {
+      const a = ensureAudio();
+      if (a && a.ctx.state === "suspended") {
+        try {
+          await a.ctx.resume();
+        } catch {}
+      }
+    }
   };
 
   if (!n) return null;
@@ -111,11 +180,23 @@ export const FilmRing = ({ projects = [] }) => {
         </div>
       </div>
       <div className="pointer-events-none mx-auto -mt-8 h-20 w-[70%] rounded-[100%] bg-bone/[0.05] blur-3xl" />
-      <div
-        data-testid="film-ring-hint"
-        className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-bone/40"
-      >
-        Drag to rotate · {projects.length} featured stories
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+        <span
+          data-testid="film-ring-hint"
+          className="font-mono text-[10px] uppercase tracking-[0.3em] text-bone/40"
+        >
+          Drag to rotate · {projects.length} featured stories
+        </span>
+        <button
+          data-testid="film-ring-sound-toggle"
+          onClick={toggleSound}
+          aria-pressed={soundOn}
+          aria-label={soundOn ? "Mute reel sound" : "Enable reel sound"}
+          className="inline-flex items-center gap-2 rounded-sm border border-line px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-bone/50 transition-colors duration-300 hover:border-bone/40 hover:text-bone"
+        >
+          {soundOn ? <Volume2 size={11} /> : <VolumeX size={11} />}
+          {soundOn ? "Reel sound on" : "Reel sound off"}
+        </button>
       </div>
     </div>
   );

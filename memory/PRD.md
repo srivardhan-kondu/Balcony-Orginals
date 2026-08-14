@@ -25,6 +25,7 @@ User uploaded a complete Website Development & Product Vision Brief (v2, Aug 202
 - Intro: skippable brand video intro (ESC/button), once per session via sessionStorage key `bo-intro-seen`
 - Hero (v2): brand 3D logo-assembly video (balcony-intro.mp4, invert+screen blend) playing over WebGL ember field, bold kinetic masked headline
 - Signature 3D (v2): FilmRing — draggable CSS-3D cylindrical carousel of featured project stills (auto-rotate + pointer drag + inertia), click panel to open project
+- Ring feel (v3): friction/fling momentum physics (heavy drag, glide release, cruise settle) + procedural reel-whir via Web Audio (brown noise → bandpass, pitch/volume track spin speed, LFO tape flutter), off by default, toggle button `film-ring-sound-toggle`, no autoplay
 
 ## Implemented (2026-08-14, v2)
 - Full site: all 9 routes, seeded CMS-like project data in MongoDB
