@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
 
@@ -35,12 +36,16 @@ export const ProjectCard = ({ project, large = false, index }) => {
       className="group block"
       aria-label={`${project.title} — ${STATUS_LABELS[project.status] || project.status}`}
     >
-      <div
+      <motion.div
         ref={ref}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
-        className="relative overflow-hidden rounded-sm border border-line bg-ink2 transition-transform duration-300 will-change-transform"
-        style={{ aspectRatio: large ? "16/10" : "16/11" }}
+        initial={{ clipPath: "inset(16% 9% 16% 9%)", opacity: 0, rotateX: 9, y: 34 }}
+        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1, rotateX: 0, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+        className="relative overflow-hidden rounded-sm border border-line bg-ink2 will-change-transform"
+        style={{ aspectRatio: large ? "16/10" : "16/11", transformPerspective: 1000 }}
       >
         <img
           src={project.hero}
@@ -83,7 +88,7 @@ export const ProjectCard = ({ project, large = false, index }) => {
             <ArrowUpRight size={15} />
           </span>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 };

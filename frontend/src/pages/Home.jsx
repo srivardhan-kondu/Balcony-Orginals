@@ -10,6 +10,8 @@ import { FilmRing } from "@/components/FilmRing";
 import { CineCamera } from "@/components/CineCamera";
 import { FilmRibbon } from "@/components/FilmRibbon";
 import { ScrollFill } from "@/components/ScrollFill";
+import { FilmReel } from "@/components/FilmReel";
+import { ProjectorBeam } from "@/components/ProjectorBeam";
 import { Marquee } from "@/components/Marquee";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
@@ -67,6 +69,21 @@ export default function Home() {
   const heroCover = useTransform(pageScrollY, [0, 900], [0, 0.62]);
   const heroScale = useTransform(pageScrollY, [0, 900], [1, 0.95]);
 
+  const stripRef = useRef(null);
+  const trackRef = useRef(null);
+  const [overflow, setOverflow] = useState(0);
+  const { scrollYProgress: stripProg } = useScroll({ target: stripRef, offset: ["start start", "end end"] });
+  const stripX = useTransform(stripProg, [0, 1], [0, -overflow]);
+
+  useEffect(() => {
+    const measure = () => {
+      if (trackRef.current) setOverflow(Math.max(0, trackRef.current.scrollWidth - window.innerWidth + 80));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [projects]);
+
   useEffect(() => {
     document.title = "Balcony Originals — Stories rooted in culture. Told for the world.";
     api.projects().then(setProjects).catch(() => {});
@@ -81,7 +98,6 @@ export default function Home() {
   }, []);
 
   const featured = projects.filter((p) => p.featured);
-  const told = projects.filter((p) => p.type === "documentary" && p.status === "completed");
   const films = projects.filter((p) => p.type === "feature");
   const upcoming = projects.filter((p) => UPCOMING_STATUSES.includes(p.status));
 
@@ -294,25 +310,50 @@ export default function Home() {
         </Reveal>
       </section>
 
-      {/* ————— DOCUMENTARIES ————— */}
-      <section data-testid="documentaries-section" className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(80px,12vh,150px)]">
-        <Reveal className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <Overline testid="docs-overline">Documentaries</Overline>
-            <h2 className="font-display font-extrabold uppercase tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] leading-[1.02] text-bone">
-              Stories we've told.
-            </h2>
+      {/* ————— THE SCREENING ROOM — pinned horizontal reel ————— */}
+      <section
+        ref={stripRef}
+        data-testid="documentaries-section"
+        className="relative"
+        style={{ height: `calc(100svh + ${Math.max(overflow, 500)}px)` }}
+      >
+        <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden border-t border-line">
+          <div className="mx-auto w-full max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <Overline testid="docs-overline">The screening room · scroll to unspool</Overline>
+                <h2 className="font-display font-extrabold uppercase leading-[1.02] tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] text-bone">
+                  One reel. Every story.
+                </h2>
+              </div>
+              <SectionLink to="/works" testid="docs-view-all-link">
+                Full archive
+              </SectionLink>
+            </div>
           </div>
-          <SectionLink to="/works?type=documentary" testid="docs-view-all-link">
-            All documentaries
-          </SectionLink>
-        </Reveal>
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          {told.map((p, i) => (
-            <Reveal key={p.slug} delay={i * 0.12}>
-              <ProjectCard project={p} large index={i} />
-            </Reveal>
-          ))}
+          <motion.div
+            ref={trackRef}
+            style={{ x: stripX }}
+            className="mt-12 flex w-max gap-6 pl-[clamp(18px,4vw,58px)] will-change-transform"
+          >
+            {projects.map((p, i) => (
+              <div key={p.slug} className="w-[80vw] flex-none md:w-[44vw] lg:w-[34vw]">
+                <ProjectCard project={p} large index={i} />
+              </div>
+            ))}
+            <Link
+              to="/works"
+              data-testid="strip-archive-link"
+              className="group flex w-[60vw] flex-none items-center justify-center rounded-sm border border-dashed border-line md:w-[26vw]"
+            >
+              <span className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-bone/60 transition-colors group-hover:text-bone">
+                Full archive <ArrowRight size={14} />
+              </span>
+            </Link>
+          </motion.div>
+          <div className="mx-[clamp(18px,4vw,58px)] mt-12 h-px bg-line">
+            <motion.div style={{ scaleX: stripProg }} className="h-px origin-left bg-bone/70" />
+          </div>
         </div>
       </section>
 
@@ -351,8 +392,9 @@ export default function Home() {
       <FilmRibbon />
 
       {/* ————— UPCOMING ————— */}
-      <section data-testid="upcoming-section" className="border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">
-        <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+      <section data-testid="upcoming-section" className="relative overflow-hidden border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">
+        <FilmReel className="pointer-events-none absolute -right-[7%] top-1/2 z-0 hidden h-[620px] w-[620px] -translate-y-1/2 opacity-60 lg:block" />
+        <div className="relative z-[2] mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Overline testid="upcoming-overline">Upcoming / In development</Overline>
@@ -403,6 +445,7 @@ export default function Home() {
           style={{ y: gemsY }}
           className="absolute inset-0 h-[120%] w-full object-cover opacity-40"
         />
+        <ProjectorBeam className="absolute inset-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink via-ink/60 to-ink" />
         <div className="relative mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,200px)]">
           <Reveal className="max-w-[780px]">

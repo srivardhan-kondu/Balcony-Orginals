@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Lenis from "lenis";
@@ -29,23 +29,13 @@ const ScrollManager = () => {
 };
 
 function App() {
-  const mainRef = useRef(null);
-
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
     window.__lenis = lenis;
     let raf;
-    let skew = 0;
     const loop = (t) => {
       lenis.raf(t);
-      // film-slip skew: the page stretches slightly with scroll velocity
-      const v = lenis.velocity || 0;
-      const target = Math.max(-3, Math.min(3, v * 0.18));
-      skew += (target - skew) * 0.12;
-      if (mainRef.current) {
-        mainRef.current.style.transform = Math.abs(skew) > 0.01 ? `skewY(${skew.toFixed(3)}deg)` : "";
-      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -63,7 +53,7 @@ function App() {
         <Intro />
         <Header />
         <ScrollManager />
-        <main ref={mainRef} className="will-change-transform">
+        <main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/works" element={<Works />} />
