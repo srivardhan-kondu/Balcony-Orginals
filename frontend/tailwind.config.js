@@ -8,22 +8,23 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        display: ['Archivo', 'system-ui', 'sans-serif'],
         serif: ['Marcellus', 'serif'],
         sans: ['Archivo', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'Menlo', 'monospace'],
         telugu: ['"Noto Serif Telugu"', 'serif'],
       },
       colors: {
-        ink: '#0C0B0A',
-        ink2: '#141210',
-        ink3: '#1A1815',
-        bone: '#F2EDE4',
-        sand: '#C7B49B',
-        gold: '#C7A05A',
-        terra: '#8C3B2B',
-        mute: '#A8A29E',
-        dim: '#6E6862',
-        line: '#262320',
+        ink: '#050505',
+        ink2: '#0D0D0D',
+        ink3: '#161616',
+        bone: '#ECECEB',
+        sand: '#9C9C9C',
+        gold: '#FFFFFF',
+        terra: '#B0402F',
+        mute: '#9C9C9C',
+        dim: '#636363',
+        line: '#1E1E1E',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

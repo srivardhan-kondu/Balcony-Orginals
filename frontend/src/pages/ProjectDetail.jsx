@@ -98,7 +98,7 @@ export default function ProjectDetail() {
           )}
           <h1
             data-testid="detail-title"
-            className="max-w-[16ch] font-serif text-[clamp(34px,6.4vw,96px)] leading-[1] tracking-[-0.02em] text-bone"
+            className="max-w-[16ch] font-display font-extrabold uppercase text-[clamp(30px,6vw,88px)] leading-[0.98] tracking-[-0.02em] text-bone"
           >
             <MaskLines lines={[project.title]} delay={0.1} />
           </h1>

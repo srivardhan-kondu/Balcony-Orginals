@@ -13,7 +13,7 @@ export const PageHero = ({ overline, titleLines, sub, testid }) => (
         </div>
       </Reveal>
     )}
-    <h1 className="font-serif text-[clamp(34px,6vw,86px)] leading-[1.02] tracking-[-0.015em] text-bone">
+    <h1 className="font-display font-extrabold uppercase text-[clamp(30px,5.6vw,80px)] leading-[0.98] tracking-[-0.02em] text-bone">
       <MaskLines lines={titleLines} delay={0.1} />
     </h1>
     {sub && (

@@ -4,7 +4,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { api, UPCOMING_STATUSES } from "@/lib/api";
 import { WebGLHero } from "@/components/WebGLHero";
-import { Reveal, MaskLines } from "@/components/Motion";
+import { Reveal, MaskLines, EASE } from "@/components/Motion";
+import { FilmRing } from "@/components/FilmRing";
 import { Marquee } from "@/components/Marquee";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
@@ -72,10 +73,31 @@ export default function Home() {
       {/* ————— HERO ————— */}
       <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
         <WebGLHero className="absolute inset-0" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/85 via-ink/15 to-ink" />
 
-        <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-gold/40" />
-        <span aria-hidden="true" className="absolute right-[26px] top-[96px] h-9 w-9 border-r border-t border-gold/40" />
+        {/* Brand animation — the 3D film-reel "B" assembling, held on its final frame */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.8, delay: 0.15, ease: EASE }}
+          className="pointer-events-none absolute inset-0 flex items-start justify-center pt-[13vh] md:items-center md:justify-end md:pr-[2vw] md:pt-0"
+        >
+          <video
+            src="/assets/balcony-intro.mp4"
+            poster="/assets/intro-poster.jpg"
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            data-testid="hero-brand-video"
+            className="bo-hero-video w-[min(86vw,440px)] opacity-95 md:w-[min(44vw,680px)]"
+            style={{ filter: "invert(1) brightness(.98) contrast(1.9)", mixBlendMode: "screen" }}
+          />
+        </motion.div>
+
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
+
+        <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-bone/25" />
+        <span aria-hidden="true" className="absolute right-[26px] top-[96px] h-9 w-9 border-r border-t border-bone/25" />
         <div className="absolute right-[clamp(26px,4vw,58px)] top-[150px] hidden font-mono text-[9.5px] leading-[2] tracking-[0.22em] text-bone/35 md:block">
           24 FPS · 35 MM
           <br />
@@ -91,7 +113,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="mb-[clamp(18px,3vh,30px)] flex items-center gap-3"
           >
-            <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-bone" />
             <span className="font-mono text-[10.5px] tracking-[0.24em] text-bone/60">
               PRODUCTION HOUSE · EST. RAYALASEEMA
             </span>
@@ -99,10 +121,10 @@ export default function Home() {
 
           <h1
             data-testid="hero-headline"
-            className="font-serif text-[clamp(38px,6.6vw,104px)] leading-[0.98] tracking-[-0.015em] text-bone"
+            className="font-display text-[clamp(34px,6.2vw,98px)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-bone"
           >
             <MaskLines
-              lines={["Stories rooted in culture.", "Told for the world."]}
+              lines={["Stories rooted", "in culture.", "Told for the world."]}
               delay={0.3}
               lastClassName="text-sand"
             />
@@ -133,7 +155,7 @@ export default function Home() {
             <Link
               to="/submit-story"
               data-testid="hero-submit-story-btn"
-              className="rounded-sm border border-bone/30 px-7 py-4 text-xs uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-gold"
+              className="rounded-sm border border-bone/30 px-7 py-4 text-xs uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-ink hover:bg-gold"
             >
               Submit Your Story
             </Link>
@@ -142,7 +164,7 @@ export default function Home() {
               data-testid="hero-watch-reel-btn"
               className="group inline-flex items-center gap-3 px-1.5 py-4 text-[11.5px] uppercase tracking-[0.15em] text-bone/60 transition-colors hover:text-bone"
             >
-              <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full border border-bone/35 transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
+              <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full border border-bone/35 transition-colors duration-300 group-hover:border-bone">
                 <Play size={10} className="ml-0.5 fill-current" />
               </span>
               Brand film
@@ -151,7 +173,7 @@ export default function Home() {
         </div>
 
         <div className="absolute bottom-0 left-1/2 hidden h-14 w-px -translate-x-1/2 overflow-hidden md:block">
-          <div className="bo-scroll-line h-full w-px bg-gold/70" />
+          <div className="bo-scroll-line h-full w-px bg-bone/70" />
         </div>
       </section>
 
@@ -163,7 +185,7 @@ export default function Home() {
           <div className="lg:sticky lg:top-32 lg:self-start">
             <Reveal>
               <Overline testid="roots-overline">Our roots</Overline>
-              <h2 className="font-serif text-[clamp(30px,4.4vw,62px)] leading-[1.04] tracking-[-0.01em] text-bone">
+              <h2 className="font-display font-extrabold uppercase tracking-[-0.015em] text-[clamp(28px,4.2vw,60px)] leading-[1.0] text-bone">
                 Born from the land.
               </h2>
               <p className="mt-7 max-w-[44ch] text-[15px] leading-[1.7] text-mute">
@@ -213,7 +235,7 @@ export default function Home() {
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Overline testid="featured-overline">Featured work</Overline>
-              <h2 className="font-serif text-[clamp(28px,3.8vw,54px)] leading-[1.05] text-bone">
+              <h2 className="font-display font-extrabold uppercase tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] leading-[1.02] text-bone">
                 The archive, so far.
               </h2>
             </div>
@@ -223,16 +245,7 @@ export default function Home() {
           </Reveal>
         </div>
         <Reveal delay={0.15}>
-          <div
-            data-testid="featured-showcase"
-            className="bo-noscroll mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto px-[clamp(18px,4vw,58px)] pb-4"
-          >
-            {featured.map((p, i) => (
-              <div key={p.slug} className="w-[82vw] flex-none snap-start md:w-[46vw] lg:w-[38vw]">
-                <ProjectCard project={p} large index={i} />
-              </div>
-            ))}
-          </div>
+          <FilmRing projects={featured} />
         </Reveal>
       </section>
 
@@ -241,7 +254,7 @@ export default function Home() {
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <Overline testid="docs-overline">Documentaries</Overline>
-            <h2 className="font-serif text-[clamp(28px,3.8vw,54px)] leading-[1.05] text-bone">
+            <h2 className="font-display font-extrabold uppercase tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] leading-[1.02] text-bone">
               Stories we've told.
             </h2>
           </div>
@@ -295,7 +308,7 @@ export default function Home() {
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Overline testid="upcoming-overline">Upcoming / In development</Overline>
-              <h2 className="font-serif text-[clamp(28px,3.8vw,54px)] leading-[1.05] text-bone">
+              <h2 className="font-display font-extrabold uppercase tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] leading-[1.02] text-bone">
                 Stories yet to be told.
               </h2>
             </div>
@@ -345,7 +358,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,200px)]">
           <Reveal className="max-w-[780px]">
             <Overline testid="gems-overline">Stories are gems</Overline>
-            <h2 className="font-serif text-[clamp(30px,5.2vw,74px)] leading-[1.03] tracking-[-0.015em] text-bone">
+            <h2 className="font-display font-extrabold uppercase tracking-[-0.02em] text-[clamp(28px,4.8vw,70px)] leading-[1.0] text-bone">
               Have a story that deserves to be told?
             </h2>
             <p className="mt-8 max-w-[52ch] text-[15.5px] leading-[1.7] text-bone/75">
@@ -395,7 +408,7 @@ export default function Home() {
       {/* ————— FINAL CTA ————— */}
       <section data-testid="final-cta-section" className="relative overflow-hidden border-t border-line bg-ink2/40">
         <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,190px)] text-center">
-          <h2 className="mx-auto max-w-[24ch] font-serif text-[clamp(28px,4.6vw,66px)] leading-[1.06] tracking-[-0.015em] text-bone">
+          <h2 className="mx-auto max-w-[24ch] font-display font-extrabold uppercase tracking-[-0.02em] text-[clamp(26px,4.4vw,62px)] leading-[1.02] text-bone">
             <MaskLines inView lines={["Every place has a story.", "Every person carries one.", "We're here to tell it."]} lastClassName="text-sand" />
           </h2>
           <Reveal delay={0.4}>

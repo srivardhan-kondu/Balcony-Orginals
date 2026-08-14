@@ -20,7 +20,7 @@ export default function NotFound() {
       <div className="font-mono text-[clamp(60px,10vw,140px)] leading-none tracking-[0.1em] text-bone/[0.08]">
         404
       </div>
-      <h1 className="mt-2 max-w-[22ch] font-serif text-[clamp(30px,4.8vw,66px)] leading-[1.06] text-bone">
+      <h1 className="mt-2 max-w-[22ch] font-display font-extrabold uppercase text-[clamp(28px,4.6vw,62px)] leading-[1.02] tracking-[-0.015em] text-bone">
         <MaskLines lines={["This story hasn't", "been told yet."]} delay={0.1} lastClassName="text-sand" />
       </h1>
       <Reveal delay={0.45}>

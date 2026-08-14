@@ -15,7 +15,7 @@ export const WebGLHero = ({ className = "" }) => {
     }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0c0b0a, 0.045);
+    scene.fog = new THREE.FogExp2(0x050505, 0.045);
     const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
     camera.position.set(0, 0.4, 8.5);
 
@@ -38,7 +38,7 @@ export const WebGLHero = ({ className = "" }) => {
     const embers = new THREE.Points(
       geo,
       new THREE.PointsMaterial({
-        color: 0xc7a05a,
+        color: 0xe6e6e6,
         size: 0.045,
         transparent: true,
         opacity: 0.8,
@@ -61,7 +61,7 @@ export const WebGLHero = ({ className = "" }) => {
     const dust = new THREE.Points(
       geo2,
       new THREE.PointsMaterial({
-        color: 0x8c6b3f,
+        color: 0x6e6e6e,
         size: 0.11,
         transparent: true,
         opacity: 0.22,
@@ -78,7 +78,7 @@ export const WebGLHero = ({ className = "" }) => {
       const m = new THREE.Mesh(
         shaftGeo,
         new THREE.MeshBasicMaterial({
-          color: 0xc7a05a,
+          color: 0xe6e6e6,
           transparent: true,
           opacity: 0.035 + i * 0.012,
           blending: THREE.AdditiveBlending,

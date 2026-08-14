@@ -116,7 +116,7 @@ export default function SubmitStory() {
                 <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold/50 text-gold">
                   <Check size={22} />
                 </span>
-                <h2 className="mt-8 font-serif text-[clamp(26px,4vw,52px)] leading-[1.08] text-bone">
+                <h2 className="mt-8 font-display font-extrabold uppercase tracking-[-0.015em] text-[clamp(24px,3.6vw,46px)] leading-[1.04] text-bone">
                   <MaskLines lines={["Thank you for trusting", "us with your story."]} lastClassName="text-sand" />
                 </h2>
                 <p className="mx-auto mt-7 max-w-[52ch] text-[15px] leading-[1.7] text-mute">

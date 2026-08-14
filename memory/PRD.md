@@ -19,13 +19,16 @@ User uploaded a complete Website Development & Product Vision Brief (v2, Aug 202
 - Image gen script: /app/scripts/generate_images.py (idempotent; rerun to regenerate missing)
 
 ## Design System
-- Colors: ink #0C0B0A, bone #F2EDE4, gold #C7A05A, sand #C7B49B, terra #8C3B2B
-- Fonts: Marcellus (serif display), Archivo (sans), Noto Serif Telugu (accents), JetBrains Mono (technical)
-- Motifs: film grain overlay, viewfinder corner ticks, mono metadata, masked headline reveals, editorial marquee (Telugu + English), slow ember/light-shaft WebGL hero
+- Colors: MONOCHROME per brand video/logo (v2, user-directed): black #050505, white #FFFFFF, silver greys; accent = pure white. (v1 gold/earth palette replaced)
+- Fonts: Archivo ExtraBold uppercase for display headlines (Sony-style), Marcellus serif for editorial quotes, Noto Serif Telugu accents, JetBrains Mono for technical
+- Motifs: film grain overlay, viewfinder corner ticks, mono metadata, masked headline reveals, editorial marquee (Telugu + English), white ember/light-shaft WebGL ambience
 - Intro: skippable brand video intro (ESC/button), once per session via sessionStorage key `bo-intro-seen`
+- Hero (v2): brand 3D logo-assembly video (balcony-intro.mp4, invert+screen blend) playing over WebGL ember field, bold kinetic masked headline
+- Signature 3D (v2): FilmRing — draggable CSS-3D cylindrical carousel of featured project stills (auto-rotate + pointer drag + inertia), click panel to open project
 
-## Implemented (2026-08-14)
+## Implemented (2026-08-14, v2)
 - Full site: all 9 routes, seeded CMS-like project data in MongoDB
+- v2 redesign per user feedback: monochrome palette, video-led hero using their 3D logo animation, bold Archivo display type site-wide, interactive 3D film-ring archive
 - WebGL hero (Three.js embers + light shafts, mouse parallax, reduced-motion fallback)
 - Skippable cinematic intro with progress bar and brand video
 - Story submission + contact forms with validation, honeypot anti-spam, success states
