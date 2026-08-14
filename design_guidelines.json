@@ -1,0 +1,196 @@
+{
+  "brand_identity": {
+    "name": "Balcony Originals",
+    "origin": "Rayalaseema, Andhra Pradesh, India",
+    "tagline": "Stories rooted in culture. Told for the world.",
+    "ethos": "An independent cinematic production house dedicated to devotional, cultural, heritage, and tourism documentaries alongside visionary feature films and raw story submissions.",
+    "emotional_tone": "Cinematic, revered, moody, authoritative, artistic, intimate, timeless",
+    "aesthetic_archetype": "ARCHETYPE 5: LUXURY & EDITORIAL CINEMA (Near-black obsidian charcoal, antique gold, film grain, corner frame crosshairs, asymmetric typography)"
+  },
+  "typography": {
+    "primary_display_font": "Marcellus, serif",
+    "primary_body_font": "Archivo, sans-serif",
+    "accent_regional_font": "Noto Serif Telugu, serif",
+    "mono_technical_font": "JetBrains Mono, monospace",
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Marcellus&family=Noto+Serif+Telugu:wght@400;600;700&display=swap",
+    "hierarchy_rules": {
+      "hero_title": "text-4xl sm:text-6xl lg:text-7xl font-serif tracking-tight leading-[1.05] text-[#F2EDE4]",
+      "section_heading": "text-2xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-[#F2EDE4]",
+      "card_title": "text-xl sm:text-2xl font-serif text-[#F2EDE4]",
+      "body_text": "text-base sm:text-lg font-sans text-[#A8A29E] leading-relaxed",
+      "overline_badge": "text-xs font-mono uppercase tracking-[0.25em] text-[#C7A05A]",
+      "telugu_quote": "font-serif text-lg sm:text-xl text-[#C7A05A]/90 italic leading-loose"
+    }
+  },
+  "colors": {
+    "background_primary": "#0C0B0A",
+    "background_secondary": "#141210",
+    "background_elevated": "#1A1815",
+    "background_glass": "rgba(12, 11, 10, 0.85)",
+    "accent_primary": "#C7A05A",
+    "accent_hover": "#D4AF37",
+    "accent_muted": "rgba(199, 160, 90, 0.2)",
+    "text_primary": "#F2EDE4",
+    "text_secondary": "#A8A29E",
+    "text_tertiary": "#6E6862",
+    "border_subtle": "#262320",
+    "border_gold": "rgba(199, 160, 90, 0.3)",
+    "earth_terracotta": "#8C3B2B",
+    "earth_ochre": "#B87333",
+    "earth_deep_green": "#1E2922"
+  },
+  "visual_enhancers": {
+    "film_grain": "CSS repeating SVG/noise canvas overlay with pointer-events-none opacity-[0.04]",
+    "viewfinder_frames": "Corner frame ticks (+ or L-shaped borders) on main hero and feature cards with technical camera metadata overlay (e.g. 24FPS • 35MM • ISO 400 • RAYALASEEMA)",
+    "glassmorphism": "backdrop-blur-xl bg-[#0C0B0A]/80 border border-[#262320]",
+    "gold_glow": "shadow-[0_0_30px_rgba(199,160,90,0.15)]",
+    "shadows": "ambient deep shadow shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+  },
+  "components_and_layouts": {
+    "navigation": {
+      "type": "Fixed Glass Header with z-50",
+      "features": "Brand logo with gold accent mark, primary links (Home, Works, Documentaries, Feature Films, Development, Submit Story, About, Contact), audio reel toggle button, full-screen mobile menu drawer with smooth framer-motion stagger",
+      "data_testids": {
+        "nav_container": "header-navigation",
+        "home_link": "nav-link-home",
+        "works_link": "nav-link-works",
+        "docs_link": "nav-link-documentaries",
+        "films_link": "nav-link-films",
+        "upcoming_link": "nav-link-upcoming",
+        "story_submit_link": "nav-link-submit-story",
+        "about_link": "nav-link-about",
+        "contact_link": "nav-link-contact"
+      }
+    },
+    "hero_webgl": {
+      "type": "Interactive Three.js particle field with light beams and atmospheric fog",
+      "elements": "3D gold light particles, interactive camera tilt on mouse move, skippable brand intro loader animation (Sony/Awwwards style countdown frame numbers + logo reveal), masked headline reveal ('Stories Rooted in Culture. Told for the World.')",
+      "cta_buttons": [
+        "Explore Works (data-testid='hero-explore-btn')",
+        "Submit Story (data-testid='hero-submit-story-btn')",
+        "Watch Reel Modal (data-testid='hero-watch-reel-btn')"
+      ]
+    },
+    "our_roots_manifesto": {
+      "type": "Numbered Chapter Accordion / Editorial Layout",
+      "chapters": [
+        "01. The Red Soil of Rayalaseema - Heritage, Forts, and Forgotten Myths",
+        "02. Devotional Echoes - Temples, Sacred Chants, and Ritual Documentaries",
+        "03. Visionary Cinema - High-Impact Feature Films with Regional Soul",
+        "04. Global Canvas - Taking Indigenous Indian Oral Traditions Worldwide"
+      ]
+    },
+    "featured_work": {
+      "type": "Horizontal Scroll / Carousel Showcase",
+      "items": "Streaming-style hero cards with hover poster zoom, video trailer preview on hover, project tags, duration, director notes, award badges"
+    },
+    "documentaries_stream": {
+      "type": "Apple TV Style Streaming UI",
+      "categories": ["Devotional", "Cultural & Folk", "Heritage & Forts", "Tourism & Trails"],
+      "detail_page_features": "Full-bleed hero banner with sound preview trigger, synopsis, episode/part guide, crew credits, high-res photo gallery, related documentaries carousel, stream request form modal"
+    },
+    "feature_films": {
+      "type": "Cinematic Grid Layout",
+      "detail_page_features": "Logline, cast & crew list, director statement, press reviews, trailer video overlay embed, release calendar"
+    },
+    "upcoming_in_development": {
+      "type": "Production Slate / Kanban View & Project Cards",
+      "stages": ["Scripting", "Pre-Production", "Principal Photography", "Post-Production"],
+      "features": "Investment / Co-production enquiry button for each project"
+    },
+    "story_submission_page": {
+      "headline": "'Stories Are Gems' - Submit Your Original Story",
+      "form_fields": [
+        "Full Name (data-testid='submit-story-name-input')",
+        "Email Address (data-testid='submit-story-email-input')",
+        "Phone / WhatsApp (data-testid='submit-story-phone-input')",
+        "Story Title (data-testid='submit-story-title-input')",
+        "Genre / Category Dropdown (data-testid='submit-story-category-select')",
+        "Logline / 2-Line Summary (data-testid='submit-story-logline-input')",
+        "Detailed Synopsis / Story Text (data-testid='submit-story-synopsis-textarea')",
+        "Script / Treatment URL (data-testid='submit-story-script-url-input')",
+        "Consent & NDA Checkbox (data-testid='submit-story-consent-checkbox')",
+        "Submit Button (data-testid='submit-story-submit-button')"
+      ],
+      "features": "Interactive feedback modal, submission tracking status simulation"
+    },
+    "about_page": {
+      "features": "Founders' story, Rayalaseema location spotlight, production gear setup, artistic manifesto, press mentions, award highlights"
+    },
+    "contact_page": {
+      "form_fields": [
+        "Name (data-testid='contact-name-input')",
+        "Email (data-testid='contact-email-input')",
+        "Subject / Project Type (data-testid='contact-subject-select')",
+        "Message (data-testid='contact-message-textarea')",
+        "Send Message (data-testid='contact-submit-button')"
+      ],
+      "office_location": "Anantapur & Tirupati, Rayalaseema, Andhra Pradesh, India"
+    },
+    "not_found_404": {
+      "features": "Cinematic film strip effect, 404 scene frame, Return to Home button (data-testid='404-go-home-btn')"
+    }
+  },
+  "media": {
+    "images": [
+      {
+        "category": "hero_background_architecture",
+        "url": "https://images.unsplash.com/photo-1650118146076-5e584e3ee165?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwzfHxjaW5lbWF0aWMlMjBmaWxtJTIwY2FtZXJhJTIwZGFyayUyMGdvbGRlbiUyMGhvdXIlMjBJbmRpYW4lMjBoZXJpdGFnZSUyMGRvY3VtZW50YXJ5fGVufDB8fHx8MTc4NjcxMDE0NHww&ixlib=rb-4.1.0&q=85",
+        "description": "Historical Rayalaseema archway leading to illuminated golden monument"
+      },
+      {
+        "category": "heritage_monument",
+        "url": "https://images.unsplash.com/photo-1770021601241-2925eb7df305?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBmaWxtJTIwY2FtZXJhJTIwZGFyayUyMGdvbGRlbiUyMGhvdXIlMjBJbmRpYW4lMjBoZXJpdGFnZSUyMGRvY3VtZW50YXJ5fGVufDB8fHx8MTc4NjcxMDE0NHww&ixlib=rb-4.1.0&q=85",
+        "description": "Sunset silhouette behind ancient temple dome"
+      },
+      {
+        "category": "river_ghat_documentary",
+        "url": "https://images.unsplash.com/photo-1681451206658-e09c11c302f1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBmaWxtJTIwY2FtZXJhJTIwZGFyayUyMGdvbGRlbiUyMGhvdXIlMjBJbmRpYW4lMjBoZXJpdGFnZSUyMGRvY3VtZW50YXJ5fGVufDB8fHx8MTc4NjcxMDE0NHww&ixlib=rb-4.1.0&q=85",
+        "description": "Intimate river ghat at golden sunset"
+      },
+      {
+        "category": "temple_night_lit",
+        "url": "https://images.unsplash.com/photo-1768766260590-a9ed3396c76e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwyfHxjaW5lbWF0aWMlMjBmaWxtJTIwY2FtZXJhJTIwZGFyayUyMGdvbGRlbiUyMGhvdXIlMjBJbmRpYW4lMjBoZXJpdGFnZSUyMGRvY3VtZW50YXJ5fGVufDB8fHx8MTc4NjcxMDE0NHww&ixlib=rb-4.1.0&q=85",
+        "description": "Silhouettes of filmmakers in front of illuminated historical stone shrine"
+      },
+      {
+        "category": "film_set_crew",
+        "url": "https://images.unsplash.com/photo-1681137063068-081072cf04b4?crop=entropy&cs=srgb&fm=jpg&ixid=M335NjY2NjV8MHwxfHNlYXJjaHw0fHxjaW5lbWElMjBjYW1lcmElMjBzaG9vdGluZyUyMGdvbGRlbiUyMGhvdXIlMjBwb3J0cmFpdCUyMGZpbG0lMjBzZXR8ZW58MHx8fHwxNzg2NzEwMTU2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Cinematography crew behind high-end camera setup on dark production set"
+      },
+      {
+        "category": "cinematographer_portrait",
+        "url": "https://images.unsplash.com/photo-1596483941213-f9d3d65cf52d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwzfHxjaW5lbWElMjBjYW1lcmElMjBzaG9vdGluZyUyMGdvbGRlbiUyMGhvdXIlMjBwb3J0cmFpdCUyMGZpbG0lMjBzZXR8ZW58MHx8fHwxNzg2NzEwMTU2fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Director of photography operating digital cinema camera rig"
+      },
+      {
+        "category": "cultural_dance_documentary",
+        "url": "https://images.unsplash.com/photo-1756370256926-e48ca54c5efe?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwxfHxJbmRpYW4lMjBjbGFzc2ljYWwlMjBkYW5jZSUyMHRlbXBsZSUyMGN1bHR1cmUlMjBoZXJpdGFnZSUyMGRvY3VtZW50YXJ5fGVufDB8fHx8MTc4NjcxMDE1Nnww&ixlib=rb-4.1.0&q=85",
+        "description": "Traditional dancers in vibrant attire on temple stone steps"
+      }
+    ]
+  },
+  "3d_and_motion_specifications": {
+    "library": "three / @react-three/fiber / framer-motion",
+    "webgl_hero": {
+      "particles_count": 800,
+      "color": "#C7A05A",
+      "interaction": "Mouse coordinates control parallax rotation of particle cloud and camera light spotlight",
+      "fallback": "Subtle animated SVG dust particles and gradient glow if WebGL is disabled or slow"
+    },
+    "scroll_animations": {
+      "lenis": "Smooth momentum scrolling enabled globally",
+      "framer_motion_stagger": "Children fade-in with y offset 30px, easeOut [0.16, 1, 0.3, 1]",
+      "marquee": "Slow 35s continuous loop of Telugu & English cinematic aphorisms"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Execute full implementation using React js, Tailwind CSS, Lucide icons, Framer Motion, and Three.js.",
+    "Import Marcellus, Archivo, and Noto Serif Telugu fonts in index.html/index.css.",
+    "Implement the cinematic skippable brand intro loader (Sony film countdown style).",
+    "Ensure every page and component has exact data-testid attributes.",
+    "Build the complete site: Home, Works Archive, Documentary Detail, Feature Film Detail, Upcoming Slate, Story Submission ('Stories Are Gems'), About, Contact, and 404.",
+    "Incorporate Apple TV style streaming cards with video preview modal capability for documentary detail pages.",
+    "Ensure the story submission form provides interactive feedback, validation, and confirmation state."
+  ]
+}

@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Marcellus&family=Noto+Serif+Telugu:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 24 10% 4%;
+        --foreground: 40 33% 92%;
+        --card: 26 9% 7%;
+        --card-foreground: 40 33% 92%;
+        --popover: 26 9% 7%;
+        --popover-foreground: 40 33% 92%;
+        --primary: 38 45% 57%;
+        --primary-foreground: 24 10% 4%;
+        --secondary: 26 8% 12%;
+        --secondary-foreground: 40 33% 92%;
+        --muted: 26 8% 12%;
+        --muted-foreground: 30 5% 62%;
+        --accent: 38 45% 57%;
+        --accent-foreground: 24 10% 4%;
+        --destructive: 8 55% 42%;
+        --destructive-foreground: 40 33% 92%;
+        --border: 30 8% 14%;
+        --input: 30 8% 18%;
+        --ring: 38 45% 57%;
+        --chart-1: 38 45% 57%;
+        --chart-2: 16 52% 36%;
+        --chart-3: 140 14% 16%;
+        --chart-4: 30 45% 45%;
+        --chart-5: 40 33% 92%;
+        --radius: 0.25rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-family: Archivo, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+    }
+    ::selection {
+        background: rgba(199, 160, 90, 0.32);
+        color: #f2ede4;
+    }
+    :focus-visible {
+        outline: 2px solid #c7a05a;
+        outline-offset: 3px;
+    }
+    input, textarea, select, button {
+        font-family: inherit;
+    }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+}
+
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Scrollbar */
+::-webkit-scrollbar { height: 8px; width: 9px; }
+::-webkit-scrollbar-track { background: #0c0b0a; }
+::-webkit-scrollbar-thumb { background: rgba(242, 237, 228, 0.16); border-radius: 9px; }
+
+/* Keyframes */
+@keyframes bo-marquee { to { transform: translateX(-50%); } }
+@keyframes bo-prog { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes bo-drift { from { transform: scale(1.04); } to { transform: scale(1.12); } }
+@keyframes bo-scroll-line {
+    0% { transform: scaleY(0); transform-origin: top; }
+    45% { transform: scaleY(1); transform-origin: top; }
+    55% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+}
+@keyframes bo-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.bo-marquee { animation: bo-marquee 48s linear infinite; }
+.bo-prog { animation: bo-prog 9.5s linear forwards; }
+.bo-scroll-line { animation: bo-scroll-line 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+
+/* Hide scrollbars on horizontal showcase rows */
+.bo-noscroll::-webkit-scrollbar { display: none; }
+.bo-noscroll { scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
+    }
+}
