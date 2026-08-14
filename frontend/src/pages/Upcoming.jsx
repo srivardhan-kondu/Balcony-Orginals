@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { api, UPCOMING_STATUSES } from "@/lib/api";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Motion";
-import { StatusChip } from "@/components/ProjectCard";
+import { SlateFocus } from "@/components/SlateFocus";
 
 export default function Upcoming() {
   const [projects, setProjects] = useState([]);
@@ -33,52 +33,7 @@ export default function Upcoming() {
           <div className="py-24 text-center font-mono text-[11px] tracking-[0.3em] text-bone/40">LOADING THE SLATE…</div>
         ) : (
           <div data-testid="upcoming-list">
-            {projects.map((p, i) => (
-              <Reveal key={p.slug} delay={i * 0.08}>
-                <Link
-                  to={`/projects/${p.slug}`}
-                  data-testid={`upcoming-card-${p.slug}`}
-                  data-preview={p.hero}
-                  className="group relative block overflow-hidden border-t border-line py-12 transition-colors duration-300 last:border-b hover:bg-ink3/30 md:py-16"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -right-4 top-1/2 hidden -translate-y-1/2 select-none font-serif text-[clamp(70px,9vw,150px)] uppercase leading-none text-bone/[0.045] lg:block"
-                  >
-                    {(p.status || "").replace("-", " ")}
-                  </span>
-                  <div className="relative grid items-center gap-6 md:grid-cols-[80px_1.4fr_1fr_auto]">
-                    <span className="font-mono text-sm tracking-[0.2em] text-gold/70">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <h2 className="font-serif text-[clamp(26px,3.4vw,48px)] leading-[1.05] text-bone transition-transform duration-500 group-hover:translate-x-2">
-                        {p.title}
-                      </h2>
-                      <p className="mt-3 max-w-[56ch] text-sm leading-relaxed text-mute">{p.logline}</p>
-                    </div>
-                    <div className="font-mono text-[10px] uppercase leading-[2.1] tracking-[0.2em] text-bone/50">
-                      {p.type === "feature" ? "FEATURE FILM" : "DOCUMENTARY"}
-                      <br />
-                      {[p.location, p.state].filter(Boolean).join(" · ").toUpperCase()}
-                      {p.year && (
-                        <>
-                          <br />
-                          {p.year}
-                        </>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-5">
-                      <StatusChip status={p.status} />
-                      <ArrowUpRight
-                        size={20}
-                        className="text-bone/40 transition-all duration-300 group-hover:translate-x-1 group-hover:text-gold"
-                      />
-                    </div>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
+            <SlateFocus projects={projects} />
           </div>
         )}
 

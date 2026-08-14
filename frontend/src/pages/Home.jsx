@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { api, UPCOMING_STATUSES } from "@/lib/api";
 import { WebGLHero } from "@/components/WebGLHero";
 import { HeroMark } from "@/components/HeroMark";
@@ -13,7 +13,8 @@ import { ScrollFill } from "@/components/ScrollFill";
 import { FilmReel } from "@/components/FilmReel";
 import { ProjectorBeam } from "@/components/ProjectorBeam";
 import { Marquee } from "@/components/Marquee";
-import { ProjectCard, StatusChip } from "@/components/ProjectCard";
+import { ProjectCard } from "@/components/ProjectCard";
+import { SlateFocus } from "@/components/SlateFocus";
 import { ReelModal } from "@/components/ReelModal";
 
 const CHAPTERS = [
