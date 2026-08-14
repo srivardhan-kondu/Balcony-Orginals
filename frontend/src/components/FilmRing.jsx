@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
+import { getAudioContext, getMaster, isSoundEnabled, setSoundEnabled, subscribeSound } from "@/lib/sound";
 
 export const FilmRing = ({ projects = [] }) => {
   const navigate = useNavigate();
@@ -13,8 +14,8 @@ export const FilmRing = ({ projects = [] }) => {
   const dragging = useRef(false);
   const lastX = useRef(0);
   const moved = useRef(0);
-  const [soundOn, setSoundOn] = useState(false);
-  const soundRef = useRef(false);
+  const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  const soundRef = useRef(isSoundEnabled());
   const audioRef = useRef(null);
   const [radius, setRadius] = useState(520);
   const radiusRef = useRef(520);
@@ -26,6 +27,15 @@ export const FilmRing = ({ projects = [] }) => {
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
   }, []);
+
+  useEffect(
+    () =>
+      subscribeSound((v) => {
+        setSoundOn(v);
+        soundRef.current = v;
+      }),
+    []
+  );
 
   useEffect(() => {
     let raf;
@@ -53,7 +63,10 @@ export const FilmRing = ({ projects = [] }) => {
       cancelAnimationFrame(raf);
       const a = audioRef.current;
       if (a) {
-        a.ctx.close().catch(() => {});
+        try {
+          a.src.stop();
+        } catch {}
+        a.gain.disconnect();
         audioRef.current = null;
       }
     };
@@ -77,11 +90,11 @@ export const FilmRing = ({ projects = [] }) => {
     dragging.current = false;
   };
 
-  const ensureAudio = () => {
+  const ensureWhir = () => {
     if (audioRef.current) return audioRef.current;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    const ctx = new AC();
+    const ctx = getAudioContext();
+    const master = getMaster();
+    if (!ctx || !master) return null;
     const len = ctx.sampleRate * 2;
     const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -100,30 +113,26 @@ export const FilmRing = ({ projects = [] }) => {
     bp.Q.value = 1.1;
     const gain = ctx.createGain();
     gain.gain.value = 0;
-    src.connect(bp).connect(gain).connect(ctx.destination);
+    src.connect(bp);
+    bp.connect(gain);
+    gain.connect(master);
     src.start();
     const lfo = ctx.createOscillator();
     const lfoGain = ctx.createGain();
     lfo.frequency.value = 7;
     lfoGain.gain.value = 0.05;
-    lfo.connect(lfoGain).connect(src.playbackRate);
+    lfo.connect(lfoGain);
+    lfoGain.connect(src.playbackRate);
     lfo.start();
-    audioRef.current = { ctx, gain, bp };
+    audioRef.current = { ctx, gain, bp, src };
     return audioRef.current;
   };
 
   const toggleSound = async () => {
     const next = !soundOn;
-    setSoundOn(next);
     soundRef.current = next;
-    if (next) {
-      const a = ensureAudio();
-      if (a && a.ctx.state === "suspended") {
-        try {
-          await a.ctx.resume();
-        } catch {}
-      }
-    }
+    if (next) ensureWhir();
+    await setSoundEnabled(next);
   };
 
   if (!n) return null;

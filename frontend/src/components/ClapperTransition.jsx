@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { playClap } from "@/lib/sound";
 
 const SCENES = {
   "/": "HOME",
@@ -32,7 +33,10 @@ export const ClapperTransition = () => {
     takeNo.current += 1;
     setTake({ scene: sceneFor(pathname), no: takeNo.current, phase: "in" });
     timers.current = [
-      setTimeout(() => setTake((s) => (s ? { ...s, phase: "snap" } : s)), 430),
+      setTimeout(() => {
+        setTake((s) => (s ? { ...s, phase: "snap" } : s));
+        playClap();
+      }, 430),
       setTimeout(() => setTake((s) => (s ? { ...s, phase: "out" } : s)), 920),
       setTimeout(() => setTake(null), 1500),
     ];
