@@ -407,33 +407,7 @@ export default function Home() {
               Full slate
             </SectionLink>
           </Reveal>
-          <div className="mt-12">
-            {upcoming.map((p, i) => (
-              <Reveal key={p.slug} delay={i * 0.08}>
-                <Link
-                  to={`/projects/${p.slug}`}
-                  data-testid={`upcoming-row-${p.slug}`}
-                  data-preview={p.hero}
-                  className="group flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line py-8 transition-colors duration-300 last:border-b hover:bg-ink3/40 md:py-10"
-                >
-                  <span className="font-mono text-[11px] tracking-[0.2em] text-gold/70">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="min-w-[200px] flex-1 font-serif text-[clamp(24px,2.6vw,36px)] text-bone transition-transform duration-500 group-hover:translate-x-2">
-                    {p.title}
-                  </h3>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bone/50">
-                    {[p.type === "feature" ? "Feature Film" : "Documentary", p.location, p.state].filter(Boolean).join(" · ")}
-                  </span>
-                  <StatusChip status={p.status} />
-                  <ArrowUpRight
-                    size={18}
-                    className="text-bone/40 transition-all duration-300 group-hover:translate-x-1 group-hover:text-gold"
-                  />
-                </Link>
-              </Reveal>
-            ))}
-          </div>
+          <SlateFocus projects={upcoming} />
         </div>
       </section>
 
