@@ -15,6 +15,7 @@ import { ProjectorBeam } from "@/components/ProjectorBeam";
 import { Marquee } from "@/components/Marquee";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SlateFocus } from "@/components/SlateFocus";
+import { ArchiveTakeover } from "@/components/ArchiveTakeover";
 import { ReelModal } from "@/components/ReelModal";
 
 const CHAPTERS = [
@@ -98,7 +99,6 @@ export default function Home() {
     return () => clearTimeout(t);
   }, []);
 
-  const featured = projects.filter((p) => p.featured);
   const films = projects.filter((p) => p.type === "feature");
   const upcoming = projects.filter((p) => UPCOMING_STATUSES.includes(p.status));
 
@@ -291,25 +291,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ————— FEATURED / ARCHIVE ————— */}
-      <section data-testid="featured-section" className="border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">
-        <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
-          <Reveal className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <Overline testid="featured-overline">Featured work</Overline>
-              <h2 className="font-display font-extrabold uppercase tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] leading-[1.02] text-bone">
-                The archive, so far.
-              </h2>
-            </div>
-            <SectionLink to="/works" testid="featured-view-all-link">
-              Full archive
-            </SectionLink>
-          </Reveal>
-        </div>
-        <Reveal delay={0.15}>
-          <FilmRing projects={featured} />
-        </Reveal>
-      </section>
+      {/* ————— THE ARCHIVE — fullscreen scroll takeover ————— */}
+      <ArchiveTakeover projects={projects} />
 
       {/* ————— THE SCREENING ROOM — pinned horizontal reel ————— */}
       <section
