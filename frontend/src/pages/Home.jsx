@@ -9,6 +9,7 @@ import { Reveal, MaskLines, EASE } from "@/components/Motion";
 import { FilmRing } from "@/components/FilmRing";
 import { CineCamera } from "@/components/CineCamera";
 import { FilmRibbon } from "@/components/FilmRibbon";
+import { ScrollFill } from "@/components/ScrollFill";
 import { Marquee } from "@/components/Marquee";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
@@ -62,6 +63,9 @@ export default function Home() {
   const gemsRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: gemsRef, offset: ["start end", "end start"] });
   const gemsY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  const { scrollY: pageScrollY } = useScroll();
+  const heroCover = useTransform(pageScrollY, [0, 900], [0, 0.62]);
+  const heroScale = useTransform(pageScrollY, [0, 900], [1, 0.95]);
 
   useEffect(() => {
     document.title = "Balcony Originals — Stories rooted in culture. Told for the world.";
@@ -84,7 +88,7 @@ export default function Home() {
   return (
     <div data-testid="home-page">
       {/* ————— HERO ————— */}
-      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
+      <section className="sticky top-0 flex h-[100svh] min-h-[100svh] flex-col justify-end overflow-hidden">
         <WebGLHero className="absolute inset-0" />
 
         {/* Brand moment — the video assembles the mark, then hands off to a live metallic 3D "B" with spinning film reels */}
@@ -137,7 +141,10 @@ export default function Home() {
           LAT 14.75 N
         </div>
 
-        <div className="relative mx-auto w-full max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(26px,4vh,46px)] pt-[clamp(110px,14vh,180px)]">
+        <motion.div
+          style={{ scale: heroScale }}
+          className="relative mx-auto w-full max-w-[1560px] origin-bottom-left px-[clamp(18px,4vw,58px)] pb-[clamp(26px,4vh,46px)] pt-[clamp(110px,14vh,180px)]"
+        >
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -201,13 +208,20 @@ export default function Home() {
               Brand film
             </button>
           </motion.div>
-        </div>
+        </motion.div>
+
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-ink"
+          style={{ opacity: heroCover }}
+        />
 
         <div className="absolute bottom-0 left-1/2 hidden h-14 w-px -translate-x-1/2 overflow-hidden md:block">
           <div className="bo-scroll-line h-full w-px bg-bone/70" />
         </div>
       </section>
 
+      <div className="relative z-[5] bg-ink">
       <Marquee />
 
       {/* ————— OUR ROOTS ————— */}
@@ -356,6 +370,7 @@ export default function Home() {
                 <Link
                   to={`/projects/${p.slug}`}
                   data-testid={`upcoming-row-${p.slug}`}
+                  data-preview={p.hero}
                   className="group flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line py-8 transition-colors duration-300 last:border-b hover:bg-ink3/40 md:py-10"
                 >
                   <span className="font-mono text-[11px] tracking-[0.2em] text-gold/70">
@@ -427,10 +442,8 @@ export default function Home() {
             </div>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="font-serif text-[clamp(20px,2.2vw,30px)] leading-[1.5] text-bone/90">
-              We believe a story doesn't need permission to matter — it needs a patient camera, an honest
-              edit, and someone willing to carry it. Balcony Originals exists to be that someone: to preserve
-              stories, produce stories, and give strong stories a chance to travel.
+            <p className="font-serif text-[clamp(20px,2.2vw,30px)] leading-[1.5] text-bone">
+              <ScrollFill text="We believe a story doesn't need permission to matter — it needs a patient camera, an honest edit, and someone willing to carry it. Balcony Originals exists to be that someone: to preserve stories, produce stories, and give strong stories a chance to travel." />
             </p>
             <div className="mt-8 font-mono text-[10.5px] tracking-[0.22em] text-bone/40">
               — BALCONY ORIGINALS · PRODUCTION PHILOSOPHY
@@ -442,8 +455,8 @@ export default function Home() {
       {/* ————— FINAL CTA ————— */}
       <section data-testid="final-cta-section" className="relative overflow-hidden border-t border-line bg-ink2/40">
         <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,190px)] text-center">
-          <h2 className="mx-auto max-w-[24ch] font-display font-extrabold uppercase tracking-[-0.02em] text-[clamp(26px,4.4vw,62px)] leading-[1.02] text-bone">
-            <MaskLines inView lines={["Every place has a story.", "Every person carries one.", "We're here to tell it."]} lastClassName="text-sand" />
+          <h2 className="mx-auto max-w-[24ch] font-display font-extrabold uppercase leading-[1.1] tracking-[-0.02em] text-[clamp(26px,4.4vw,62px)] text-bone">
+            <ScrollFill text="Every place has a story. Every person carries one. We're here to tell it." />
           </h2>
           <Reveal delay={0.4}>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-3.5">
@@ -465,6 +478,7 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+      </div>
 
       <ReelModal open={reelOpen} onClose={() => setReelOpen(false)} label="BALCONY ORIGINALS · BRAND FILM" />
     </div>

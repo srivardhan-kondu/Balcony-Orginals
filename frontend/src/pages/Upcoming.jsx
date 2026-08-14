@@ -38,6 +38,7 @@ export default function Upcoming() {
                 <Link
                   to={`/projects/${p.slug}`}
                   data-testid={`upcoming-card-${p.slug}`}
+                  data-preview={p.hero}
                   className="group relative block overflow-hidden border-t border-line py-12 transition-colors duration-300 last:border-b hover:bg-ink3/30 md:py-16"
                 >
                   <span

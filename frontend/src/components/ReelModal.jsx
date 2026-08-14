@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
   useEffect(() => {
@@ -16,7 +17,7 @@ export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       data-testid="reel-modal"
       onClick={onClose}
@@ -41,6 +42,7 @@ export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
           data-testid="reel-video"
         />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
