@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component {
 
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-8 text-center">
-        <img src="/assets/bo-mark.png" alt="Balcony Originals" className="w-[64px] opacity-70" />
+        <img src="/assets/bo-mark.png" alt="Balcony Originals" className="bo-logo w-[64px] opacity-70" />
         <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-bone/50">
           This reel dropped a frame.
         </p>

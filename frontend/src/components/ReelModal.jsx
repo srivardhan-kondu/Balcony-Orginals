@@ -17,11 +17,13 @@ export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
 
   if (!open) return null;
 
+  // bo-dark: a video lightbox stays a darkened room in either theme — and the
+  // invert/screen filter on the video only reads against a dark ground.
   return createPortal(
     <div
       data-testid="reel-modal"
       onClick={onClose}
-      className="fixed inset-0 z-[150] flex cursor-pointer items-center justify-center bg-[#060605]/95 p-[clamp(20px,5vw,80px)]"
+      className="bo-dark fixed inset-0 z-[150] flex cursor-pointer items-center justify-center bg-scrim/95 p-[clamp(20px,5vw,80px)]"
       role="dialog"
       aria-label="Video player"
     >

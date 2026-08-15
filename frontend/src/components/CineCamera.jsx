@@ -1,13 +1,23 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { useThemeMode } from "@/lib/theme";
+
+// See FilmReel: bright chrome reflecting a bright room flattens out on paper,
+// so the light theme casts the body in steel at a lower exposure.
+const MATERIAL = {
+  dark: { chrome: 0xe9e9e9, roughness: 0.24, exposure: 1.1 },
+  light: { chrome: 0x9a9691, roughness: 0.32, exposure: 0.92 },
+};
 
 export const CineCamera = ({ className = "" }) => {
   const mountRef = useRef(null);
+  const mode = useThemeMode();
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    const material = MATERIAL[mode];
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -17,7 +27,7 @@ export const CineCamera = ({ className = "" }) => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = material.exposure;
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -36,7 +46,11 @@ export const CineCamera = ({ className = "" }) => {
     scene.add(rim);
     scene.add(new THREE.AmbientLight(0xffffff, 0.2));
 
-    const chrome = new THREE.MeshStandardMaterial({ color: 0xe9e9e9, metalness: 1, roughness: 0.24 });
+    const chrome = new THREE.MeshStandardMaterial({
+      color: material.chrome,
+      metalness: 1,
+      roughness: material.roughness,
+    });
     const dark = new THREE.MeshStandardMaterial({ color: 0x232323, metalness: 0.85, roughness: 0.45 });
 
     const cam = new THREE.Group();
@@ -136,7 +150,7 @@ export const CineCamera = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [mode]);
 
   return <div ref={mountRef} data-testid="cine-camera-3d" aria-hidden="true" className={className} />;
 };

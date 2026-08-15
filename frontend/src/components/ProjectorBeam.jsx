@@ -1,12 +1,31 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { useThemeMode } from "@/lib/theme";
+
+// A projector beam is light thrown into a dark room, so additive white is right
+// in the dark theme and invisible in the light one. On paper the same cone is
+// drawn as the shadow the beam would cast instead.
+const PALETTE = {
+  dark: {
+    blending: THREE.AdditiveBlending,
+    cone: { color: 0xffffff, opacity: 0.075 },
+    dust: { color: 0xffffff, opacity: 0.55 },
+  },
+  light: {
+    blending: THREE.NormalBlending,
+    cone: { color: 0x2e2a25, opacity: 0.05 },
+    dust: { color: 0x3a352e, opacity: 0.3 },
+  },
+};
 
 export const ProjectorBeam = ({ className = "" }) => {
   const mountRef = useRef(null);
+  const mode = useThemeMode();
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    const palette = PALETTE[mode];
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -29,10 +48,10 @@ export const ProjectorBeam = ({ className = "" }) => {
 
     const coneGeo = new THREE.CylinderGeometry(0.05, 1.7, 7.5, 32, 1, true);
     const coneMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+      color: palette.cone.color,
       transparent: true,
-      opacity: 0.075,
-      blending: THREE.AdditiveBlending,
+      opacity: palette.cone.opacity,
+      blending: palette.blending,
       side: THREE.DoubleSide,
       depthWrite: false,
     });
@@ -58,11 +77,11 @@ export const ProjectorBeam = ({ className = "" }) => {
     const dust = new THREE.Points(
       dustGeo,
       new THREE.PointsMaterial({
-        color: 0xffffff,
+        color: palette.dust.color,
         size: 0.03,
         transparent: true,
-        opacity: 0.55,
-        blending: THREE.AdditiveBlending,
+        opacity: palette.dust.opacity,
+        blending: palette.blending,
         depthWrite: false,
       })
     );
@@ -113,7 +132,7 @@ export const ProjectorBeam = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [mode]);
 
   return <div ref={mountRef} data-testid="projector-beam-3d" aria-hidden="true" className={className} />;
 };

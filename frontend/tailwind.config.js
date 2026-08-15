@@ -15,56 +15,62 @@ module.exports = {
         telugu: ['"Noto Serif Telugu"', 'serif'],
       },
       colors: {
-        ink: '#050505',
-        ink2: '#0D0D0D',
-        ink3: '#161616',
-        bone: '#ECECEB',
-        sand: '#9C9C9C',
-        gold: '#FFFFFF',
-        terra: '#B0402F',
-        mute: '#9C9C9C',
-        dim: '#636363',
-        line: '#1E1E1E',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // Theme-driven; values live in index.css. `<alpha-value>` is what keeps
+        // the opacity modifiers (`text-bone/40`, `bg-ink/85`) working.
+        ink: 'rgb(var(--bo-ink) / <alpha-value>)',
+        ink2: 'rgb(var(--bo-ink2) / <alpha-value>)',
+        ink3: 'rgb(var(--bo-ink3) / <alpha-value>)',
+        bone: 'rgb(var(--bo-bone) / <alpha-value>)',
+        sand: 'rgb(var(--bo-sand) / <alpha-value>)',
+        gold: 'rgb(var(--bo-gold) / <alpha-value>)',
+        terra: 'rgb(var(--bo-terra) / <alpha-value>)',
+        mute: 'rgb(var(--bo-mute) / <alpha-value>)',
+        dim: 'rgb(var(--bo-dim) / <alpha-value>)',
+        line: 'rgb(var(--bo-line) / <alpha-value>)',
+        scrim: 'rgb(var(--bo-scrim) / <alpha-value>)',
+        background: 'hsl(var(--background) / <alpha-value>)',
+        foreground: 'hsl(var(--foreground) / <alpha-value>)',
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))'
+          DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+          foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))'
+          DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
+          foreground: 'hsl(var(--popover-foreground) / <alpha-value>)'
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))'
+          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+          foreground: 'hsl(var(--primary-foreground) / <alpha-value>)'
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))'
+          DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+          foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)'
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))'
+          DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
+          foreground: 'hsl(var(--muted-foreground) / <alpha-value>)'
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))'
+          DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+          foreground: 'hsl(var(--accent-foreground) / <alpha-value>)'
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))'
+          DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)'
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
+        border: 'hsl(var(--border) / <alpha-value>)',
+        input: 'hsl(var(--input) / <alpha-value>)',
+        ring: 'hsl(var(--ring) / <alpha-value>)',
         chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))'
+          '1': 'hsl(var(--chart-1) / <alpha-value>)',
+          '2': 'hsl(var(--chart-2) / <alpha-value>)',
+          '3': 'hsl(var(--chart-3) / <alpha-value>)',
+          '4': 'hsl(var(--chart-4) / <alpha-value>)',
+          '5': 'hsl(var(--chart-5) / <alpha-value>)'
         }
+      },
+      boxShadow: {
+        lift: '0 40px 90px rgb(var(--bo-shadow) / var(--bo-shadow-strength))',
       },
       borderRadius: {
         lg: 'var(--radius)',

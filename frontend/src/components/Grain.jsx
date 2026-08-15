@@ -4,7 +4,7 @@ export const Grain = () => (
   <div
     aria-hidden="true"
     data-testid="film-grain-overlay"
-    className="pointer-events-none fixed inset-0 z-[90] opacity-[0.05] mix-blend-overlay"
+    className="bo-grain pointer-events-none fixed inset-0 z-[90]"
     style={{ backgroundImage: NOISE, backgroundSize: "200px 200px" }}
   />
 );

@@ -5,7 +5,7 @@ export const Footer = () => (
     <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(48px,7vh,90px)]">
       <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <img src="/assets/bo-lockup.png" alt="Balcony Originals" className="h-12 w-auto opacity-95" />
+          <img src="/assets/bo-lockup.png" alt="Balcony Originals" className="bo-logo h-12 w-auto opacity-95" />
           <p className="mt-6 max-w-[36ch] font-serif text-xl leading-snug text-sand md:text-2xl">
             Stories rooted in culture. Told for the world.
           </p>

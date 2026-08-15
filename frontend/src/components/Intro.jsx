@@ -59,12 +59,14 @@ export const Intro = () => {
 
   if (!show) return null;
 
+  // bo-dark: the splash is a black-letterboxed brand film, so it plays the same
+  // in both themes rather than flipping with the page.
   return (
     <div
       data-testid="brand-intro"
       role="dialog"
       aria-label="Balcony Originals"
-      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-black"
+      className="bo-dark fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-black"
       style={{ opacity: fading ? 0 : 1, transition: `opacity ${FADE_MS}ms ease` }}
     >
       {/* The video is letterboxed black on black, so overflowing it on narrow

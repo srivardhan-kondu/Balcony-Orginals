@@ -193,7 +193,7 @@ export const FilmRing = ({ projects = [] }) => {
                 backfaceVisibility: "hidden",
               }}
             >
-              <div className="relative h-full w-full overflow-hidden rounded-sm border border-line bg-ink2 shadow-[0_40px_90px_rgba(0,0,0,0.55)]">
+              <div className="relative h-full w-full overflow-hidden rounded-sm border border-line bg-ink2 shadow-lift">
                 <img src={p.hero} alt={p.title} draggable={false} className="h-full w-full object-cover" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
                 <span aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 border-l border-t border-bone/40" />

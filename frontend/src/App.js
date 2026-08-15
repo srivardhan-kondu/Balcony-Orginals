@@ -19,6 +19,9 @@ import SubmitStory from "@/pages/SubmitStory";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
+import { useThemeMode } from "@/lib/theme";
+
+const THEME_COLOR = { dark: "#0C0B0A", light: "#FAF9F6" };
 
 const ScrollManager = () => {
   const { pathname, search } = useLocation();
@@ -30,6 +33,15 @@ const ScrollManager = () => {
 };
 
 function App() {
+  const mode = useThemeMode();
+
+  // Keeps the browser chrome (mobile address bar, PWA surface) in step with the
+  // theme; the boot script sets it for the first paint.
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", THEME_COLOR[mode]);
+  }, [mode]);
+
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
@@ -72,7 +84,7 @@ function App() {
         <FootageCounter />
         <ClapperTransition />
         <CursorPreview />
-        <Toaster theme="dark" position="bottom-right" />
+        <Toaster position="bottom-right" />
       </BrowserRouter>
     </div>
   );

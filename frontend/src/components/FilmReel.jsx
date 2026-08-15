@@ -1,13 +1,24 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { useThemeMode } from "@/lib/theme";
+
+// Polished metal reflects the environment, so on paper the bright finish reads
+// as a blank silhouette. Light darkens it to steel and pulls the exposure back
+// so the form keeps its edges against the page.
+const MATERIAL = {
+  dark: { chrome: 0xe9e9e9, roughness: 0.22, exposure: 1.1 },
+  light: { chrome: 0x9a9691, roughness: 0.3, exposure: 0.92 },
+};
 
 export const FilmReel = ({ className = "" }) => {
   const mountRef = useRef(null);
+  const mode = useThemeMode();
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    const material = MATERIAL[mode];
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -17,7 +28,7 @@ export const FilmReel = ({ className = "" }) => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = material.exposure;
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -36,7 +47,11 @@ export const FilmReel = ({ className = "" }) => {
     scene.add(rim);
     scene.add(new THREE.AmbientLight(0xffffff, 0.2));
 
-    const chrome = new THREE.MeshStandardMaterial({ color: 0xe9e9e9, metalness: 1, roughness: 0.22 });
+    const chrome = new THREE.MeshStandardMaterial({
+      color: material.chrome,
+      metalness: 1,
+      roughness: material.roughness,
+    });
     const dark = new THREE.MeshStandardMaterial({ color: 0x141414, metalness: 0.7, roughness: 0.5 });
 
     const reel = new THREE.Group();
@@ -112,7 +127,7 @@ export const FilmReel = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [mode]);
 
   return <div ref={mountRef} data-testid="film-reel-3d" aria-hidden="true" className={className} />;
 };

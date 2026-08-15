@@ -117,8 +117,14 @@ export const FilmRibbon = () => {
     };
   }, []);
 
+  // bo-dark: the strip texture is a physical film negative — dark base, bright
+  // frames. Keeping the whole band dark makes it a film strip laid on the page
+  // in the light theme, rather than a negative nobody can read.
   return (
-    <section data-testid="film-ribbon" className="relative h-[34vh] overflow-hidden border-y border-line md:h-[42vh]">
+    <section
+      data-testid="film-ribbon"
+      className="bo-dark relative h-[34vh] overflow-hidden border-y border-line bg-ink md:h-[42vh]"
+    >
       <div ref={mountRef} className="absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink via-transparent to-ink" />
       <div className="pointer-events-none absolute bottom-5 left-[clamp(18px,4vw,58px)] font-mono text-[9.5px] tracking-[0.26em] text-bone/40">
