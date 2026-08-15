@@ -73,7 +73,7 @@ const Panel = ({ p, i, active, onFocus }) => {
               src={p.hero}
               alt={p.title}
               loading="lazy"
-              className={`h-full w-full object-cover transition-all duration-[1200ms] ${
+              className={`h-full w-full object-cover transition-all [transition-duration:1200ms] ${
                 active ? "scale-100 opacity-100 grayscale-0" : "scale-[1.07] opacity-60 grayscale"
               }`}
             />

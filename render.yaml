@@ -1,0 +1,29 @@
+# Render Blueprint — deploys the FastAPI backend.
+# Render → New → Blueprint → pick this repo. Render reads this file automatically.
+services:
+  - type: web
+    name: balcony-originals-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # sync: false = Render prompts for it / you set it in the dashboard.
+      # Leave MONGO_URL empty for the first deploy — the API boots without it
+      # and the data endpoints return 503 until you paste the Atlas URI in.
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: balcony_originals
+      # Comma-separated exact origins, e.g. https://balconyoriginals.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
+      # Optional regex to also allow Vercel preview deploys, e.g.
+      # ^https://balcony-originals-.*\.vercel\.app$
+      - key: CORS_ORIGIN_REGEX
+        sync: false

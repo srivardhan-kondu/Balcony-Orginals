@@ -5,6 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import re
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
@@ -13,12 +14,54 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-app = FastAPI()
+# MONGO_URL is optional at boot: the service must come up green on Render even before
+# a database is attached, so the data endpoints degrade to 503 instead of crashing.
+MONGO_URL = os.environ.get("MONGO_URL", "").strip()
+DB_NAME = os.environ.get("DB_NAME", "balcony_originals").strip()
+
+client = None
+db = None
+if MONGO_URL:
+    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    db = client[DB_NAME]
+else:
+    logger.warning("MONGO_URL is not set — API will start, but data endpoints return 503 until it is configured.")
+
+
+def require_db():
+    """Motor objects don't support truth-testing, so compare against None explicitly."""
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database is not configured yet.")
+    return db
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    await seed_projects()
+    yield
+    if client is not None:
+        client.close()
+
+
+app = FastAPI(title="Balcony Originals API", lifespan=lifespan)
 api_router = APIRouter(prefix="/api")
+
+# Browsers reject credentialed requests against a wildcard origin, so only enable
+# credentials once CORS_ORIGINS names real origins. Set it to the Vercel domain(s).
+CORS_ORIGINS = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()] or ["*"]
+CORS_ORIGIN_REGEX = os.environ.get("CORS_ORIGIN_REGEX", "").strip() or None
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_origin_regex=CORS_ORIGIN_REGEX,
+    allow_credentials="*" not in CORS_ORIGINS,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -185,9 +228,24 @@ async def root():
     return {"message": "Balcony Originals API"}
 
 
+@api_router.get("/health")
+async def health():
+    """Render's health check. Stays 200 while the app is up so a detached or
+    unreachable database never takes the whole service down."""
+    if db is None:
+        return {"status": "ok", "database": "not_configured"}
+    try:
+        await client.admin.command("ping")
+        return {"status": "ok", "database": "connected"}
+    except Exception as exc:
+        logger.warning("Health check could not reach MongoDB: %s", exc)
+        return {"status": "ok", "database": "unreachable"}
+
+
 @api_router.get("/projects")
 async def list_projects(type: Optional[str] = None, status: Optional[str] = None,
                         category: Optional[str] = None, featured: Optional[bool] = None):
+    database = require_db()
     query = {}
     if type:
         query["type"] = type
@@ -197,12 +255,13 @@ async def list_projects(type: Optional[str] = None, status: Optional[str] = None
         query["categories"] = category
     if featured is not None:
         query["featured"] = featured
-    return await db.projects.find(query, {"_id": 0}).sort("order", 1).to_list(200)
+    return await database.projects.find(query, {"_id": 0}).sort("order", 1).to_list(200)
 
 
 @api_router.get("/projects/{slug}")
 async def get_project(slug: str):
-    doc = await db.projects.find_one({"slug": slug}, {"_id": 0})
+    database = require_db()
+    doc = await database.projects.find_one({"slug": slug}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Project not found")
     return doc
@@ -212,6 +271,7 @@ async def get_project(slug: str):
 async def create_submission(payload: StorySubmission):
     if payload.website:
         return {"ok": True}
+    database = require_db()
     if not payload.name.strip():
         raise HTTPException(status_code=422, detail="Name is required")
     if not EMAIL_RE.match(payload.email):
@@ -224,7 +284,7 @@ async def create_submission(payload: StorySubmission):
     doc.pop("website", None)
     doc["status"] = "New"
     doc["created_at"] = datetime.now(timezone.utc).isoformat()
-    await db.story_submissions.insert_one(doc)
+    await database.story_submissions.insert_one(doc)
     return {"ok": True, "message": "Thank you for trusting us with your story. Our team will review your submission and reach out if it fits our current storytelling or production interests."}
 
 
@@ -232,6 +292,7 @@ async def create_submission(payload: StorySubmission):
 async def create_contact(payload: ContactMessage):
     if payload.website:
         return {"ok": True}
+    database = require_db()
     if not payload.name.strip():
         raise HTTPException(status_code=422, detail="Name is required")
     if not EMAIL_RE.match(payload.email):
@@ -242,30 +303,21 @@ async def create_contact(payload: ContactMessage):
     doc.pop("website", None)
     doc["status"] = "New"
     doc["created_at"] = datetime.now(timezone.utc).isoformat()
-    await db.contact_messages.insert_one(doc)
+    await database.contact_messages.insert_one(doc)
     return {"ok": True, "message": "Thank you — we have it. We'll get back to you soon."}
 
 
-@app.on_event("startup")
 async def seed_projects():
-    if await db.projects.count_documents({}) == 0:
-        await db.projects.insert_many([dict(p) for p in PROJECTS_SEED])
+    """Seeds only an empty collection. Never fatal: a missing or unreachable
+    database must not stop the web service from booting."""
+    if db is None:
+        return
+    try:
+        if await db.projects.count_documents({}) == 0:
+            await db.projects.insert_many([dict(p) for p in PROJECTS_SEED])
+            logger.info("Seeded %d projects into '%s'.", len(PROJECTS_SEED), DB_NAME)
+    except Exception as exc:
+        logger.error("Could not seed projects (the API will still serve): %s", exc)
 
 
 app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()

@@ -1,6 +1,11 @@
 import axios from "axios";
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+// REACT_APP_* is inlined at build time, so this is baked into the bundle by Vercel.
+// Trailing slashes are stripped, and an unset var falls back to a same-origin "/api"
+// rather than producing the string "undefined/api".
+const BASE = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/+$/, "");
+
+const API = `${BASE}/api`;
 
 export const api = {
   projects: (params) => axios.get(`${API}/projects`, { params }).then((r) => r.data),

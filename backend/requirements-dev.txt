@@ -1,0 +1,19 @@
+# Local development, testing and tooling. NOT installed on Render.
+# Install with:  pip install -r requirements.txt -r requirements-dev.txt
+-r requirements.txt
+
+# Tests
+pytest>=8.0.0
+pytest-xdist>=3.6.0
+requests>=2.31.0
+
+# Lint / format / types
+black>=24.1.1
+isort>=5.13.2
+flake8>=7.0.0
+mypy>=1.8.0
+
+# Used by scripts/generate_images.py only.
+# emergentintegrations is NOT on public PyPI — it ships from the Emergent package
+# index, so it is deliberately excluded from the deploy requirements:
+#   pip install emergentintegrations --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/

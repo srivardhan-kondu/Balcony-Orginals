@@ -132,7 +132,7 @@ export default function Home() {
               onEnded={() => setBrandVideoDone(true)}
               onError={() => setBrandVideoDone(true)}
               data-testid="hero-brand-video"
-              className="bo-hero-video absolute inset-0 h-full w-full object-contain transition-opacity duration-[1400ms]"
+              className="bo-hero-video absolute inset-0 h-full w-full object-contain transition-opacity [transition-duration:1400ms]"
               style={{
                 filter: "invert(1) brightness(.98) contrast(1.9)",
                 mixBlendMode: "screen",
