@@ -17,18 +17,25 @@ export const Intro = () => {
   const [fading, setFading] = useState(false);
   const vidRef = useRef(null);
   const ended = useRef(false);
+  const started = useRef(false);
 
   useEffect(() => {
     if (!show) return;
     document.documentElement.style.overflow = "hidden";
     const v = vidRef.current;
     if (v) v.play().catch(() => {});
+    // If the film never starts rolling (slow connection, blocked autoplay),
+    // don't hold anyone on a black screen — hand them the site.
+    const stallT = setTimeout(() => {
+      if (!started.current) end();
+    }, 4500);
     const hardT = setTimeout(() => end(), 10000);
     const onKey = (e) => {
       if (e.key === "Escape") end();
     };
     window.addEventListener("keydown", onKey);
     return () => {
+      clearTimeout(stallT);
       clearTimeout(hardT);
       window.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
@@ -69,14 +76,18 @@ export const Intro = () => {
       <div className="relative flex flex-col items-center gap-[clamp(18px,4vh,42px)] px-6">
         <video
           ref={vidRef}
-          src="/assets/balcony-intro.mp4"
-          poster="/assets/intro-poster.jpg"
+          src="/assets/splash.mp4"
+          poster="/assets/splash-poster.jpg"
+          autoPlay
           muted
           playsInline
           preload="auto"
+          onPlaying={() => {
+            started.current = true;
+          }}
           onEnded={end}
           onError={() => setTimeout(() => end(), 1200)}
-          className="block max-h-[62vh] w-[min(74vw,860px)]"
+          className="block max-h-[58vh] w-[min(82vw,940px)]"
           style={{ filter: "invert(1) brightness(.97) contrast(1.9)", mixBlendMode: "screen" }}
         />
         <motion.div
