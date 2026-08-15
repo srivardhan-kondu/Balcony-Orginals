@@ -7,6 +7,7 @@ import { Grain } from "@/components/Grain";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Intro } from "@/components/Intro";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FootageCounter } from "@/components/FootageCounter";
 import { ClapperTransition } from "@/components/ClapperTransition";
 import { CursorPreview } from "@/components/CursorPreview";
@@ -54,16 +55,18 @@ function App() {
         <Header />
         <ScrollManager />
         <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/works" element={<Works />} />
-            <Route path="/projects/:slug" element={<ProjectDetail />} />
-            <Route path="/upcoming" element={<Upcoming />} />
-            <Route path="/submit-story" element={<SubmitStory />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/works" element={<Works />} />
+              <Route path="/projects/:slug" element={<ProjectDetail />} />
+              <Route path="/upcoming" element={<Upcoming />} />
+              <Route path="/submit-story" element={<SubmitStory />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </ErrorBoundary>
         </main>
         <Footer />
         <FootageCounter />

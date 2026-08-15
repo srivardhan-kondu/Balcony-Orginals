@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { EASE } from "@/components/Motion";
 
-const Corner = ({ pos }) => (
-  <span aria-hidden="true" className={`absolute h-[38px] w-[38px] border-gold/50 ${pos}`} />
-);
+// The loader owns the screen for roughly the length of the logo animation.
+// FALLBACK_MS is the backstop: if the video never fires `ended` — blocked
+// autoplay, a codec the browser refuses, a stalled download — the poster
+// frame is already on screen, and we hand over the site anyway.
+const FALLBACK_MS = 2800;
+const ERROR_MS = 1400;
+const FADE_MS = 550;
 
 export const Intro = () => {
   const [show, setShow] = useState(() => {
@@ -17,28 +19,27 @@ export const Intro = () => {
   const [fading, setFading] = useState(false);
   const vidRef = useRef(null);
   const ended = useRef(false);
-  const started = useRef(false);
 
   useEffect(() => {
     if (!show) return;
-    document.documentElement.style.overflow = "hidden";
+
+    const html = document.documentElement;
+    const prevOverflow = html.style.overflow;
+    html.style.overflow = "hidden";
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const v = vidRef.current;
-    if (v) v.play().catch(() => {});
-    // If the film never starts rolling (slow connection, blocked autoplay),
-    // don't hold anyone on a black screen — hand them the site.
-    const stallT = setTimeout(() => {
-      if (!started.current) end();
-    }, 4500);
-    const hardT = setTimeout(() => end(), 10000);
-    const onKey = (e) => {
-      if (e.key === "Escape") end();
-    };
+    if (v && !reduced) v.play().catch(() => {});
+
+    // Reduced motion still gets the mark, just held as a still rather than animated.
+    const t = setTimeout(() => end(), reduced ? 1100 : FALLBACK_MS);
+    const onKey = (e) => e.key === "Escape" && end();
     window.addEventListener("keydown", onKey);
+
     return () => {
-      clearTimeout(stallT);
-      clearTimeout(hardT);
+      clearTimeout(t);
       window.removeEventListener("keydown", onKey);
-      document.documentElement.style.overflow = "";
+      html.style.overflow = prevOverflow;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -53,7 +54,7 @@ export const Intro = () => {
     setTimeout(() => {
       setShow(false);
       document.documentElement.style.overflow = "";
-    }, 800);
+    }, FADE_MS);
   };
 
   if (!show) return null;
@@ -61,61 +62,34 @@ export const Intro = () => {
   return (
     <div
       data-testid="brand-intro"
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-ink transition-opacity duration-700"
-      style={{ opacity: fading ? 0 : 1 }}
       role="dialog"
-      aria-label="Balcony Originals brand intro"
+      aria-label="Balcony Originals"
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-black"
+      style={{ opacity: fading ? 0 : 1, transition: `opacity ${FADE_MS}ms ease` }}
     >
-      <Corner pos="left-[26px] top-[26px] border-l border-t" />
-      <Corner pos="right-[26px] top-[26px] border-r border-t" />
-      <Corner pos="left-[26px] bottom-[26px] border-l border-b" />
-      <Corner pos="right-[26px] bottom-[26px] border-r border-b" />
+      {/* The video is letterboxed black on black, so overflowing it on narrow
+          screens simply crops empty frame — the mark reads large on a phone
+          without needing a separate mobile cut. */}
+      <video
+        ref={vidRef}
+        src="/assets/splash.mp4"
+        poster="/assets/splash-poster.jpg"
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        onEnded={end}
+        onError={() => setTimeout(end, ERROR_MS)}
+        className="w-[150vw] max-h-[62vh] max-w-none shrink-0 object-contain sm:w-[min(86vw,720px)]"
+      />
 
-      <div className="absolute inset-x-0 top-0 h-px bg-bone/10" />
-
-      <div className="relative flex flex-col items-center gap-[clamp(18px,4vh,42px)] px-6">
-        <video
-          ref={vidRef}
-          src="/assets/splash.mp4"
-          poster="/assets/splash-poster.jpg"
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onPlaying={() => {
-            started.current = true;
-          }}
-          onEnded={end}
-          onError={() => setTimeout(() => end(), 1200)}
-          className="block max-h-[58vh] w-[min(82vw,940px)]"
-          style={{ filter: "invert(1) brightness(.97) contrast(1.9)", mixBlendMode: "screen" }}
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, delay: 1.6, ease: EASE }}
-          className="text-center font-serif text-[clamp(17px,2.1vw,29px)] leading-[1.35] text-bone"
-        >
-          Stories rooted in culture.
-          <br />
-          <span className="text-sand">Told for the world.</span>
-        </motion.div>
+      <div className="mt-[clamp(14px,3vh,30px)] flex flex-col items-center gap-[clamp(12px,2.4vh,20px)] px-8">
+        <span aria-hidden="true" className="h-px w-[52px] bg-bone/25" />
+        <p className="max-w-[290px] text-center font-mono text-[9.5px] uppercase leading-[2.1] tracking-[0.26em] text-bone/45 sm:max-w-none sm:text-[10.5px] sm:tracking-[0.3em]">
+          Stories rooted in culture. Told for the world.
+        </p>
       </div>
-
-      <div className="absolute bottom-[clamp(30px,5vh,54px)] left-[clamp(26px,4vw,58px)] font-mono text-[10.5px] leading-[1.9] tracking-[0.2em] text-bone/40">
-        BALCONY ORIGINALS
-        <br />
-        PRODUCTION HOUSE · RAYALASEEMA
-      </div>
-
-      <button
-        data-testid="intro-skip-btn"
-        onClick={end}
-        className="absolute right-[clamp(26px,4vw,58px)] top-[clamp(64px,9vh,92px)] inline-flex items-center gap-2.5 rounded-sm border border-bone/20 bg-ink/50 px-4 py-2.5 text-[11px] uppercase tracking-[0.16em] text-bone/70 transition-colors duration-300 hover:border-bone hover:text-bone"
-      >
-        Skip intro
-        <span className="font-mono text-[10px] tracking-normal opacity-50">ESC</span>
-      </button>
     </div>
   );
 };
