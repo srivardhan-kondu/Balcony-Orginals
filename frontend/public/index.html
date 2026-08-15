@@ -22,6 +22,52 @@
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
         <title>Balcony Originals — Stories rooted in culture. Told for the world.</title>
+        <!-- The pre-boot screen paints before the CSS bundle exists, so its two
+             background values are literals here rather than theme tokens. -->
+        <style>
+            #bo-preboot {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #000;
+            }
+            #bo-preboot img {
+                width: min(150vw, 720px);
+                max-width: none;
+            }
+            /* Second visit onward the splash is skipped, so stand in for the
+               page instead of for the black splash that is no longer coming. */
+            html[data-preboot="page"] #bo-preboot {
+                background: #050505;
+            }
+            html[data-preboot="page"] #bo-preboot img {
+                display: none;
+            }
+            html.light[data-preboot="page"] #bo-preboot {
+                background: #faf9f6;
+            }
+        </style>
+        <!-- Theme, applied before first paint. Without this the page paints in
+             the default theme and then corrects itself once React mounts. -->
+        <script>
+            (function () {
+                var d = document.documentElement;
+                var t = "dark";
+                try {
+                    var s = localStorage.getItem("bo-theme");
+                    if (s === "light" || s === "dark") t = s;
+                } catch (e) {}
+                d.classList.add(t);
+                d.style.colorScheme = t;
+                var m = document.querySelector('meta[name="theme-color"]');
+                if (m) m.setAttribute("content", t === "light" ? "#FAF9F6" : "#0C0B0A");
+                try {
+                    if (sessionStorage.getItem("bo-intro-seen")) d.setAttribute("data-preboot", "page");
+                } catch (e) {}
+            })();
+        </script>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <!-- defer: this is a third-party host. Parsed synchronously it blocks
              rendering entirely when the host is slow or unreachable (in-app
@@ -34,21 +80,8 @@
              then the brand mark stands in for the splash, so a slow bundle
              shows the logo rather than an empty black screen. -->
         <div id="root">
-            <div
-                style="
-                    position: fixed;
-                    inset: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #000;
-                "
-            >
-                <img
-                    src="/assets/splash-poster.jpg"
-                    alt="Balcony Originals"
-                    style="width: min(150vw, 720px); max-width: none"
-                />
+            <div id="bo-preboot">
+                <img src="/assets/splash-poster.jpg" alt="Balcony Originals" />
             </div>
         </div>
         <!--

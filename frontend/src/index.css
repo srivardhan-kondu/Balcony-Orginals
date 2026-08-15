@@ -4,8 +4,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   Theme tokens.
+
+   The palette is defined once, as RGB channel triplets, so Tailwind can apply
+   opacity modifiers to it (`text-bone/40`) via `rgb(var(--bo-bone) / <alpha>)`.
+   Every `bg-ink` / `text-bone` / `border-line` in the app therefore flips with
+   the theme without touching a single component.
+
+   `.bo-dark` pins a subtree to the dark palette whatever the page theme is.
+   Custom properties inherit, so a `.bo-dark` element simply redeclares them for
+   itself and its children. It is for surfaces that are dark by design — the
+   brand splash, the video lightbox, the film ribbon — where light-on-dark is
+   the point rather than a consequence of the theme.
+   --------------------------------------------------------------------------- */
 @layer base {
-    :root {
+    :root,
+    .dark,
+    .bo-dark {
+        --bo-ink: 5 5 5;
+        --bo-ink2: 13 13 13;
+        --bo-ink3: 22 22 22;
+        --bo-bone: 236 236 235;
+        --bo-sand: 156 156 156;
+        --bo-gold: 255 255 255;
+        --bo-terra: 176 64 47;
+        --bo-mute: 156 156 156;
+        --bo-dim: 99 99 99;
+        --bo-line: 30 30 30;
+
+        /* Full-screen overlays (mobile menu, lightbox). */
+        --bo-scrim: 9 8 7;
+        /* Cast shadows: near-black, and strong enough to read on a dark page. */
+        --bo-shadow: 0 0 0;
+        --bo-shadow-strength: 0.55;
+        --bo-selection-bg: 255 255 255;
+        --bo-selection-alpha: 0.25;
+        --bo-selection-fg: 244 244 244;
+        --bo-scrollbar-track: 12 11 10;
+        --bo-scrollbar-thumb-alpha: 0.18;
+        /* Film grain reads as light specks knocked into a dark frame. */
+        --bo-grain-opacity: 0.05;
+        --bo-grain-blend: overlay;
+
         --background: 24 10% 4%;
         --foreground: 40 33% 92%;
         --card: 26 9% 7%;
@@ -32,6 +73,56 @@
         --chart-5: 40 33% 92%;
         --radius: 0.25rem;
     }
+
+    /* Light is the same palette inverted around the same warm axis: paper
+       instead of theatre. `gold` stays the accent — pure black rather than
+       pure white — so `bg-gold text-ink` buttons invert correctly. */
+    .light {
+        --bo-ink: 250 249 246;
+        --bo-ink2: 243 241 236;
+        --bo-ink3: 232 229 222;
+        --bo-bone: 26 24 20;
+        --bo-sand: 107 103 97;
+        --bo-gold: 10 9 8;
+        --bo-terra: 154 52 35;
+        --bo-mute: 107 103 97;
+        --bo-dim: 110 106 100;
+        --bo-line: 221 216 206;
+
+        --bo-scrim: 250 249 246;
+        /* Warm, and far softer — a near-black drop shadow looks like soot on paper. */
+        --bo-shadow: 60 50 40;
+        --bo-shadow-strength: 0.14;
+        --bo-selection-bg: 26 24 20;
+        --bo-selection-alpha: 0.16;
+        --bo-selection-fg: 10 9 8;
+        --bo-scrollbar-track: 240 238 232;
+        --bo-scrollbar-thumb-alpha: 0.26;
+        /* Overlay blend lightens on a light ground, so the grain disappears.
+           Multiply keeps it as tooth in the paper instead. */
+        --bo-grain-opacity: 0.055;
+        --bo-grain-blend: multiply;
+
+        --background: 40 24% 97%;
+        --foreground: 40 16% 9%;
+        --card: 40 20% 95%;
+        --card-foreground: 40 16% 9%;
+        --popover: 40 24% 97%;
+        --popover-foreground: 40 16% 9%;
+        --primary: 30 10% 6%;
+        --primary-foreground: 40 24% 97%;
+        --secondary: 38 16% 91%;
+        --secondary-foreground: 40 16% 9%;
+        --muted: 38 16% 91%;
+        --muted-foreground: 35 6% 40%;
+        --accent: 30 10% 6%;
+        --accent-foreground: 40 24% 97%;
+        --destructive: 8 60% 37%;
+        --destructive-foreground: 40 33% 96%;
+        --border: 36 14% 84%;
+        --input: 36 14% 78%;
+        --ring: 30 10% 25%;
+    }
 }
 
 @layer base {
@@ -46,11 +137,11 @@
         overflow-x: hidden;
     }
     ::selection {
-        background: rgba(255, 255, 255, 0.25);
-        color: #f4f4f4;
+        background: rgb(var(--bo-selection-bg) / var(--bo-selection-alpha));
+        color: rgb(var(--bo-selection-fg));
     }
     :focus-visible {
-        outline: 2px solid #ffffff;
+        outline: 2px solid rgb(var(--bo-gold));
         outline-offset: 3px;
     }
     input, textarea, select, button {
@@ -64,6 +155,23 @@
     }
 }
 
+/* Film grain. `overlay` lightens against a light ground, which erases the
+   grain entirely, so the light theme multiplies it in as tooth instead. */
+.bo-grain {
+    opacity: var(--bo-grain-opacity);
+    mix-blend-mode: var(--bo-grain-blend);
+}
+
+/* The brand marks are white artwork on transparency, so on paper they need to
+   be flipped to black. They are monochrome, which makes `invert` exact.
+   Marks sitting inside a pinned-dark surface stay white. */
+.light .bo-logo {
+    filter: invert(1);
+}
+.light .bo-dark .bo-logo {
+    filter: none;
+}
+
 /* Lenis smooth scroll */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -71,8 +179,11 @@ html.lenis, html.lenis body { height: auto; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { height: 8px; width: 9px; }
-::-webkit-scrollbar-track { background: #0c0b0a; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 9px; }
+::-webkit-scrollbar-track { background: rgb(var(--bo-scrollbar-track)); }
+::-webkit-scrollbar-thumb {
+    background: rgb(var(--bo-bone) / var(--bo-scrollbar-thumb-alpha));
+    border-radius: 9px;
+}
 
 /* Keyframes */
 @keyframes bo-marquee { to { transform: translateX(-50%); } }
@@ -86,7 +197,8 @@ html.lenis, html.lenis body { height: auto; }
 }
 @keyframes bo-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* Clapperboard page transition */
+/* Clapperboard page transition. The slate is a black-and-white prop, so it
+   plays the same in both themes rather than restyling itself. */
 .bo-take {
     position: fixed;
     inset: 0;

@@ -120,7 +120,10 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%)" }}
+          style={{
+            background:
+              "radial-gradient(ellipse at center, transparent 55%, rgb(var(--bo-shadow) / var(--bo-shadow-strength)) 100%)",
+          }}
         />
 
         <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-bone/25" />

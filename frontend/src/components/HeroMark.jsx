@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { useThemeMode } from "@/lib/theme";
+
+// A metal's colour tints what it reflects, so bright chrome reflecting a bright
+// room disappears into paper. The light theme casts the mark in graphite: still
+// unmistakably metal, but reading dark against the page the way it reads bright
+// against the dark one.
+const MATERIAL = {
+  dark: { color: 0xf2f2f2, roughness: 0.18, exposure: 1.15 },
+  light: { color: 0x3a3733, roughness: 0.28, exposure: 0.95 },
+};
 
 const buildBGeometry = () => {
   const s = new THREE.Shape();
@@ -31,6 +41,7 @@ const buildBGeometry = () => {
 
 export const HeroMark = ({ className = "" }) => {
   const mountRef = useRef(null);
+  const mode = useThemeMode();
   // The mark is a real element of the page, not decoration, so it must survive
   // WebGL being unavailable, blocked or lost. A still of the same mark carries
   // it until — and only if — the canvas has actually painted a frame.
@@ -61,7 +72,7 @@ export const HeroMark = ({ className = "" }) => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = MATERIAL[mode].exposure;
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -80,7 +91,11 @@ export const HeroMark = ({ className = "" }) => {
     scene.add(rim);
     scene.add(new THREE.AmbientLight(0xffffff, 0.22));
 
-    const chrome = new THREE.MeshStandardMaterial({ color: 0xf2f2f2, metalness: 1, roughness: 0.18 });
+    const chrome = new THREE.MeshStandardMaterial({
+      color: MATERIAL[mode].color,
+      metalness: 1,
+      roughness: MATERIAL[mode].roughness,
+    });
     const group = new THREE.Group();
     scene.add(group);
 
@@ -179,14 +194,14 @@ export const HeroMark = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [mode]);
 
   return (
     <div data-testid="hero-3d-mark" aria-hidden="true" className={className}>
       <img
         src="/assets/bo-hero-mark.png"
         alt=""
-        className="absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
+        className="bo-logo absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
         style={{ opacity: painted ? 0 : 1 }}
       />
       <div ref={mountRef} className="absolute inset-0" />
