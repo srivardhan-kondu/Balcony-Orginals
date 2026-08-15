@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
@@ -31,6 +31,10 @@ const buildBGeometry = () => {
 
 export const HeroMark = ({ className = "" }) => {
   const mountRef = useRef(null);
+  // The mark is a real element of the page, not decoration, so it must survive
+  // WebGL being unavailable, blocked or lost. A still of the same mark carries
+  // it until — and only if — the canvas has actually painted a frame.
+  const [painted, setPainted] = useState(false);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -41,6 +45,19 @@ export const HeroMark = ({ className = "" }) => {
     } catch {
       return;
     }
+    let hasPainted = false;
+    const onPainted = () => {
+      if (hasPainted) return;
+      hasPainted = true;
+      setPainted(true);
+    };
+    const canvas = renderer.domElement;
+    const onLost = (e) => {
+      e.preventDefault();
+      hasPainted = false;
+      setPainted(false);
+    };
+    canvas.addEventListener("webglcontextlost", onLost);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -115,6 +132,12 @@ export const HeroMark = ({ className = "" }) => {
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // setSize clears the drawing buffer, and the reduced-motion path has no
+      // loop to redraw it — without this the canvas stays blank for good.
+      if (reduced) {
+        renderer.render(scene, camera);
+        onPainted();
+      }
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -133,14 +156,18 @@ export const HeroMark = ({ className = "" }) => {
       });
       key.position.set(Math.cos(t * 0.4) * 4, 3.5, Math.sin(t * 0.4) * 4 + 3);
       renderer.render(scene, camera);
+      onPainted();
       raf = requestAnimationFrame(tick);
     };
-    if (reduced) renderer.render(scene, camera);
-    else raf = requestAnimationFrame(tick);
+    if (reduced) {
+      renderer.render(scene, camera);
+      onPainted();
+    } else raf = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      canvas.removeEventListener("webglcontextlost", onLost);
       window.removeEventListener("pointermove", onMouse);
       bGeo.dispose();
       reelGeo.dispose();
@@ -154,5 +181,15 @@ export const HeroMark = ({ className = "" }) => {
     };
   }, []);
 
-  return <div ref={mountRef} data-testid="hero-3d-mark" aria-hidden="true" className={className} />;
+  return (
+    <div data-testid="hero-3d-mark" aria-hidden="true" className={className}>
+      <img
+        src="/assets/bo-hero-mark.png"
+        alt=""
+        className="absolute inset-0 h-full w-full object-contain transition-opacity duration-700"
+        style={{ opacity: painted ? 0 : 1 }}
+      />
+      <div ref={mountRef} className="absolute inset-0" />
+    </div>
+  );
 };

@@ -99,15 +99,25 @@ export const WebGLHero = ({ className = "" }) => {
     };
     window.addEventListener("pointermove", onMouse, { passive: true });
 
+    let lastW = 0;
+    let lastH = 0;
     const resize = () => {
-      const w = mount.clientWidth || 1;
-      const h = mount.clientHeight || 1;
+      const w = mount.clientWidth;
+      const h = mount.clientHeight;
+      if (!w || !h || (w === lastW && h === lastH)) return;
+      lastW = w;
+      lastH = h;
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // setSize clears the drawing buffer. With reduced motion there is no
+      // animation loop to redraw it, so a resize would otherwise leave the
+      // canvas permanently blank.
+      if (reduced) renderer.render(scene, camera);
     };
     resize();
-    window.addEventListener("resize", resize);
+    const ro = new ResizeObserver(resize);
+    ro.observe(mount);
 
     let raf = 0;
     const clock = new THREE.Clock();
@@ -137,7 +147,7 @@ export const WebGLHero = ({ className = "" }) => {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      ro.disconnect();
       window.removeEventListener("pointermove", onMouse);
       geo.dispose();
       geo2.dispose();
