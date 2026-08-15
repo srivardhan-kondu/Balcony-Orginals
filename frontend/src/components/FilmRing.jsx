@@ -9,20 +9,22 @@ export const FilmRing = ({ projects = [] }) => {
   const items = projects.length ? [...projects, ...projects] : [];
   const n = items.length;
   const ringRef = useRef(null);
+  const panelRefs = useRef([]);
   const rot = useRef(0);
   const vel = useRef(0.1);
   const dragging = useRef(false);
   const lastX = useRef(0);
+  const lastScroll = useRef(0);
   const moved = useRef(0);
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const soundRef = useRef(isSoundEnabled());
   const audioRef = useRef(null);
-  const [radius, setRadius] = useState(520);
-  const radiusRef = useRef(520);
+  const [radius, setRadius] = useState(720);
+  const radiusRef = useRef(720);
   radiusRef.current = radius;
 
   useEffect(() => {
-    const fit = () => setRadius(Math.max(270, Math.min(520, window.innerWidth * 0.36)));
+    const fit = () => setRadius(Math.max(340, Math.min(760, window.innerWidth * 0.46)));
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
@@ -42,13 +44,26 @@ export const FilmRing = ({ projects = [] }) => {
     const tick = () => {
       if (!dragging.current) {
         rot.current += vel.current;
-        // friction, then settle into a slow cruise — weighty glide
         vel.current *= 0.965;
         vel.current += (0.09 - vel.current) * 0.008;
       }
+      // the reel also turns as the page scrolls
+      const sy = window.scrollY || 0;
+      rot.current += (sy - lastScroll.current) * 0.03;
+      lastScroll.current = sy;
+
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate(-50%, -50%) translateZ(${-radiusRef.current}px) rotateX(-4deg) rotateY(${rot.current}deg)`;
+        ringRef.current.style.transform = `translate(-50%, -50%) translateZ(${-radiusRef.current}px) rotateX(-5deg) rotateY(${rot.current}deg)`;
       }
+      // spotlight: the story facing you burns brightest
+      const seg = 360 / (panelRefs.current.length || 1);
+      panelRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const a = (((rot.current + i * seg) % 360) + 360) % 360;
+        const facing = Math.max(-1, Math.min(1, Math.cos((a * Math.PI) / 180)));
+        const b = 0.45 + 0.6 * Math.max(0, facing);
+        el.style.filter = `brightness(${b.toFixed(3)})`;
+      });
       const a = audioRef.current;
       if (a) {
         const speed = Math.min(Math.abs(vel.current), 5);
@@ -61,12 +76,12 @@ export const FilmRing = ({ projects = [] }) => {
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      const a = audioRef.current;
-      if (a) {
+      const a2 = audioRef.current;
+      if (a2) {
         try {
-          a.src.stop();
+          a2.src.stop();
         } catch {}
-        a.gain.disconnect();
+        a2.gain.disconnect();
         audioRef.current = null;
       }
     };
@@ -82,7 +97,7 @@ export const FilmRing = ({ projects = [] }) => {
     if (!dragging.current) return;
     const dx = e.clientX - lastX.current;
     lastX.current = e.clientX;
-    rot.current += dx * 0.16;
+    rot.current += dx * 0.14;
     vel.current = Math.max(-6, Math.min(6, vel.current * 0.5 + dx * 0.05));
     moved.current += Math.abs(dx);
   };
@@ -138,13 +153,13 @@ export const FilmRing = ({ projects = [] }) => {
   if (!n) return null;
 
   return (
-    <div data-testid="film-ring-section" className="relative mt-4">
+    <div data-testid="film-ring-section" className="relative mt-2">
       <div
         data-testid="film-ring"
         role="region"
         aria-label="Interactive 3D archive of featured stories — drag to rotate"
-        className="relative mx-auto h-[400px] cursor-grab select-none active:cursor-grabbing md:h-[540px]"
-        style={{ perspective: "1500px", touchAction: "pan-y" }}
+        className="relative mx-auto h-[460px] cursor-grab select-none active:cursor-grabbing md:h-[62vh] md:min-h-[540px]"
+        style={{ perspective: "1700px", touchAction: "pan-y" }}
         onPointerDown={down}
         onPointerMove={move}
         onPointerUp={up}
@@ -152,49 +167,63 @@ export const FilmRing = ({ projects = [] }) => {
       >
         <div
           ref={ringRef}
-          className="absolute left-1/2 top-1/2 h-[190px] w-[290px] md:h-[230px] md:w-[350px]"
+          className="absolute left-1/2 top-[44%] h-[220px] w-[330px] md:h-[300px] md:w-[470px]"
           style={{
             transformStyle: "preserve-3d",
-            transform: `translate(-50%, -50%) translateZ(${-radius}px) rotateX(-4deg)`,
+            transform: `translate(-50%, -50%) translateZ(${-radius}px) rotateX(-5deg)`,
           }}
         >
           {items.map((p, i) => (
             <div
               key={`${p.slug}-${i}`}
+              ref={(el) => (panelRefs.current[i] = el)}
               data-testid={`film-ring-panel-${i}`}
               onClick={() => {
                 if (moved.current < 8) navigate(`/projects/${p.slug}`);
               }}
-              className="group absolute inset-0 overflow-hidden rounded-sm border border-line bg-ink2"
+              className="group absolute inset-0 cursor-pointer"
               style={{
                 transform: `rotateY(${(360 / n) * i}deg) translateZ(${radius}px)`,
                 backfaceVisibility: "hidden",
               }}
             >
-              <img
-                src={p.hero}
-                alt={p.title}
-                draggable={false}
-                className="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4">
-                <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-bone/60">
-                  {STATUS_LABELS[p.status] || p.status}
+              <div className="relative h-full w-full overflow-hidden rounded-sm border border-line bg-ink2 shadow-[0_40px_90px_rgba(0,0,0,0.55)]">
+                <img src={p.hero} alt={p.title} draggable={false} className="h-full w-full object-cover" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
+                <span aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 border-l border-t border-bone/40" />
+                <span aria-hidden="true" className="pointer-events-none absolute right-3 top-3 h-4 w-4 border-r border-t border-bone/40" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/65">
+                    {STATUS_LABELS[p.status] || p.status}
+                  </div>
+                  <div className="mt-1.5 font-display text-xl font-bold uppercase leading-tight tracking-tight text-bone md:text-2xl">
+                    {p.title}
+                  </div>
                 </div>
-                <div className="mt-1 font-serif text-lg leading-tight text-bone">{p.title}</div>
+              </div>
+              {/* floor reflection */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-full h-[58%] w-full opacity-[0.16]"
+                style={{
+                  transform: "scaleY(-1)",
+                  WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 80%)",
+                  maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 80%)",
+                }}
+              >
+                <img src={p.hero} alt="" draggable={false} className="h-full w-full object-cover" />
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="pointer-events-none mx-auto -mt-8 h-20 w-[70%] rounded-[100%] bg-bone/[0.05] blur-3xl" />
+      <div className="pointer-events-none mx-auto -mt-6 h-24 w-[78%] rounded-[100%] bg-bone/[0.06] blur-3xl" />
       <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
         <span
           data-testid="film-ring-hint"
           className="font-mono text-[10px] uppercase tracking-[0.3em] text-bone/40"
         >
-          Drag to rotate · {projects.length} featured stories
+          Drag to rotate · scroll turns the reel · {projects.length} featured stories
         </span>
         <button
           data-testid="film-ring-sound-toggle"
