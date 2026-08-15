@@ -101,19 +101,20 @@ export default function Home() {
         {/* The splash already spends the full lockup, and the header carries it
             permanently. So the hero holds the monogram only — a live metallic
             "B" with spinning reels, read as an object rather than a third logo. */}
+        {/* On phones the mark sits in normal flow directly above the copy, so it
+            can never land on top of the headline whatever the screen height.
+            From md up it lifts out of flow and pins to the right of the type. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.8, delay: 0.15, ease: EASE }}
-          className="pointer-events-none absolute inset-0 flex items-start justify-center pt-[12vh] md:items-center md:justify-end md:pr-[3vw] md:pt-0"
+          className="pointer-events-none relative aspect-square w-[min(38vw,150px,20vh)] shrink-0 ml-[clamp(18px,4vw,58px)] md:absolute md:right-[3vw] md:top-1/2 md:ml-0 md:w-[min(42vw,600px)] md:-translate-y-1/2"
         >
-          <div className="relative aspect-square w-[min(86vw,440px)] md:w-[min(44vw,640px)]">
-            <HeroMark className="absolute inset-0" />
-            <div
-              aria-hidden="true"
-              className="absolute left-1/2 top-[78%] h-16 w-[70%] -translate-x-1/2 rounded-[100%] bg-bone/[0.06] blur-2xl"
-            />
-          </div>
+          <HeroMark className="absolute inset-0" />
+          <div
+            aria-hidden="true"
+            className="absolute left-1/2 top-[78%] h-16 w-[70%] -translate-x-1/2 rounded-[100%] bg-bone/[0.06] blur-2xl"
+          />
         </motion.div>
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
@@ -134,7 +135,7 @@ export default function Home() {
 
         <motion.div
           style={{ scale: heroScale }}
-          className="relative mx-auto w-full max-w-[1560px] origin-bottom-left px-[clamp(18px,4vw,58px)] pb-[clamp(26px,4vh,46px)] pt-[clamp(110px,14vh,180px)]"
+          className="relative mx-auto w-full max-w-[1560px] origin-bottom-left px-[clamp(18px,4vw,58px)] pb-[clamp(26px,4vh,46px)] pt-[clamp(20px,3vh,40px)] md:pt-[clamp(110px,14vh,180px)]"
         >
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -150,7 +151,7 @@ export default function Home() {
 
           <h1
             data-testid="hero-headline"
-            className="font-display text-[clamp(34px,6.2vw,98px)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-bone"
+            className="font-display text-[clamp(28px,6.2vw,98px)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-bone"
           >
             <MaskLines
               lines={["Stories rooted", "in culture.", "Told for the world."]}

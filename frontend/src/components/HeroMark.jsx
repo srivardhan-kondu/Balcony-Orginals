@@ -100,15 +100,25 @@ export const HeroMark = ({ className = "" }) => {
     };
     window.addEventListener("pointermove", onMouse, { passive: true });
 
+    // Watch the mount, not the window: if the element has not been laid out
+    // when this first runs, a window listener alone would leave the canvas
+    // stuck at 1x1 until something happened to resize the window — which on
+    // a desktop that simply sits there never happens.
+    let lastW = 0;
+    let lastH = 0;
     const resize = () => {
-      const w = mount.clientWidth || 1;
-      const h = mount.clientHeight || 1;
+      const w = mount.clientWidth;
+      const h = mount.clientHeight;
+      if (!w || !h || (w === lastW && h === lastH)) return;
+      lastW = w;
+      lastH = h;
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     };
     resize();
-    window.addEventListener("resize", resize);
+    const ro = new ResizeObserver(resize);
+    ro.observe(mount);
 
     let raf = 0;
     const clock = new THREE.Clock();
@@ -130,7 +140,7 @@ export const HeroMark = ({ className = "" }) => {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      ro.disconnect();
       window.removeEventListener("pointermove", onMouse);
       bGeo.dispose();
       reelGeo.dispose();
