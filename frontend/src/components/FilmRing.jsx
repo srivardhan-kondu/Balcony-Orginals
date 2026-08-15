@@ -19,12 +19,16 @@ export const FilmRing = ({ projects = [] }) => {
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const soundRef = useRef(isSoundEnabled());
   const audioRef = useRef(null);
-  const [radius, setRadius] = useState(720);
-  const radiusRef = useRef(720);
-  radiusRef.current = radius;
+  const [size, setSize] = useState({ w: 470, h: 300, r: 723 });
+  const radiusRef = useRef(723);
+  radiusRef.current = size.r;
 
   useEffect(() => {
-    const fit = () => setRadius(Math.max(340, Math.min(760, window.innerWidth * 0.46)));
+    const fit = () => {
+      const vw = window.innerWidth;
+      const w = Math.max(230, Math.min(470, Math.round(vw * 0.6)));
+      setSize({ w, h: Math.round(w * 0.64), r: Math.round(w / 0.65) });
+    };
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
@@ -158,8 +162,8 @@ export const FilmRing = ({ projects = [] }) => {
         data-testid="film-ring"
         role="region"
         aria-label="Interactive 3D archive of featured stories — drag to rotate"
-        className="relative mx-auto h-[460px] cursor-grab select-none active:cursor-grabbing md:h-[62vh] md:min-h-[540px]"
-        style={{ perspective: "1700px", touchAction: "pan-y" }}
+        className="relative mx-auto cursor-grab select-none active:cursor-grabbing"
+        style={{ perspective: "1700px", touchAction: "pan-y", height: Math.max(420, Math.round(size.h * 2.1)) }}
         onPointerDown={down}
         onPointerMove={move}
         onPointerUp={up}
@@ -167,10 +171,12 @@ export const FilmRing = ({ projects = [] }) => {
       >
         <div
           ref={ringRef}
-          className="absolute left-1/2 top-[44%] h-[220px] w-[330px] md:h-[300px] md:w-[470px]"
+          className="absolute left-1/2 top-[44%]"
           style={{
+            width: size.w,
+            height: size.h,
             transformStyle: "preserve-3d",
-            transform: `translate(-50%, -50%) translateZ(${-radius}px) rotateX(-5deg)`,
+            transform: `translate(-50%, -50%) translateZ(${-size.r}px) rotateX(-5deg)`,
           }}
         >
           {items.map((p, i) => (
@@ -183,7 +189,7 @@ export const FilmRing = ({ projects = [] }) => {
               }}
               className="group absolute inset-0 cursor-pointer"
               style={{
-                transform: `rotateY(${(360 / n) * i}deg) translateZ(${radius}px)`,
+                transform: `rotateY(${(360 / n) * i}deg) translateZ(${size.r}px)`,
                 backfaceVisibility: "hidden",
               }}
             >
@@ -192,11 +198,11 @@ export const FilmRing = ({ projects = [] }) => {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
                 <span aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 border-l border-t border-bone/40" />
                 <span aria-hidden="true" className="pointer-events-none absolute right-3 top-3 h-4 w-4 border-r border-t border-bone/40" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/65">
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5 md:p-5">
+                  <div className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-bone/65 md:text-[10px]">
                     {STATUS_LABELS[p.status] || p.status}
                   </div>
-                  <div className="mt-1.5 font-display text-xl font-bold uppercase leading-tight tracking-tight text-bone md:text-2xl">
+                  <div className="mt-1 font-display text-[15px] font-bold uppercase leading-tight tracking-tight text-bone md:mt-1.5 md:text-2xl">
                     {p.title}
                   </div>
                 </div>
