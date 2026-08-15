@@ -61,8 +61,6 @@ const SectionLink = ({ to, children, testid }) => (
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [reelOpen, setReelOpen] = useState(false);
-  const [brandVideoDone, setBrandVideoDone] = useState(false);
-  const brandVidRef = useRef(null);
   const gemsRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: gemsRef, offset: ["start end", "end start"] });
   const gemsY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
@@ -90,14 +88,6 @@ export default function Home() {
     api.projects().then(setProjects).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const v = brandVidRef.current;
-    if (v) v.play().catch(() => {});
-    // guaranteed handoff to the live 3D mark even if the video stalls or never buffers
-    const t = setTimeout(() => setBrandVideoDone(true), 9500);
-    return () => clearTimeout(t);
-  }, []);
-
   const featured = projects.filter((p) => p.featured);
   const films = projects.filter((p) => p.type === "feature");
   const upcoming = projects.filter((p) => UPCOMING_STATUSES.includes(p.status));
@@ -108,7 +98,9 @@ export default function Home() {
       <section className="sticky top-0 flex h-[100svh] min-h-[100svh] flex-col justify-end overflow-hidden">
         <WebGLHero className="absolute inset-0" />
 
-        {/* Brand moment — the video assembles the mark, then hands off to a live metallic 3D "B" with spinning film reels */}
+        {/* The splash already spends the full lockup, and the header carries it
+            permanently. So the hero holds the monogram only — a live metallic
+            "B" with spinning reels, read as an object rather than a third logo. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -120,24 +112,6 @@ export default function Home() {
             <div
               aria-hidden="true"
               className="absolute left-1/2 top-[78%] h-16 w-[70%] -translate-x-1/2 rounded-[100%] bg-bone/[0.06] blur-2xl"
-            />
-            <video
-              ref={brandVidRef}
-              src="/assets/balcony-intro.mp4"
-              poster="/assets/intro-poster.jpg"
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              onEnded={() => setBrandVideoDone(true)}
-              onError={() => setBrandVideoDone(true)}
-              data-testid="hero-brand-video"
-              className="bo-hero-video absolute inset-0 h-full w-full object-contain transition-opacity [transition-duration:1400ms]"
-              style={{
-                filter: "invert(1) brightness(.98) contrast(1.9)",
-                mixBlendMode: "screen",
-                opacity: brandVideoDone ? 0 : 0.95,
-              }}
             />
           </div>
         </motion.div>

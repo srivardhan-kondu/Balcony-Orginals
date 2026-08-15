@@ -85,9 +85,6 @@ html.lenis, html.lenis body { height: auto; }
     100% { transform: scaleY(0); transform-origin: bottom; }
 }
 @keyframes bo-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes bo-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-
-.bo-hero-video { animation: bo-float 9s ease-in-out infinite; }
 
 /* Clapperboard page transition */
 .bo-take {
