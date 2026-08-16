@@ -15,7 +15,7 @@ export const Footer = () => (
           <p className="mt-6 max-w-[36ch] font-serif text-xl leading-snug text-sand md:text-2xl">
             Stories rooted in culture. Told for the world.
           </p>
-          <p className="mt-6 font-mono text-[10.5px] leading-relaxed tracking-[0.18em] text-mute">
+          <p className="mt-6 font-mono text-[10.5px] leading-relaxed tracking-[0.18em] text-dim">
             PRODUCTION HOUSE · RAYALASEEMA
             <br />
             ANDHRA PRADESH · INDIA
@@ -58,10 +58,10 @@ export const Footer = () => (
         </div>
       </div>
       <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-7">
-        <span className="font-mono text-[10px] tracking-[0.2em] text-mute">
+        <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
           © {new Date().getFullYear()} BALCONY ORIGINALS
         </span>
-        <span className="font-mono text-[10px] tracking-[0.2em] text-mute">
+        <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
           EVERY STORY IS A GEM
         </span>
       </div>

@@ -40,6 +40,21 @@
         --bo-gold: 199 160 90;
         --bo-gold-hi: 212 175 55;
         --bo-terra: 176 64 47;
+        /* Two registers for secondary text, and the choice between them is
+           whether a reader loses anything by not reading it.
+
+           `mute`   information — form labels, credits, metadata, counts,
+                    loading and empty states, anything instructional. Carries
+                    7.4:1 here and 5.1:1 on paper, so it is legible at the 10px
+                    the mono captions are set at.
+           `dim`    atmosphere — the footage counter, the film-strip captions,
+                    the locality lines, the © row. Text as texture. Renders
+                    #636363 against `ink`, which is the quiet register this
+                    design was drawn in; on paper it is darker than a flat
+                    alpha would give, so it stays readable there.
+
+           Reach for `mute` by default. `dim` is for text that is part of the
+           set dressing, and it should stay a short list. */
         --bo-mute: 156 156 156;
         --bo-dim: 99 99 99;
         --bo-line: 30 30 30;

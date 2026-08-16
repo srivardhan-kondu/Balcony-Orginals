@@ -118,7 +118,7 @@ export const SlateFocus = ({ projects = [] }) => {
                 />
                 <span
                   className={`font-mono text-[10px] tracking-[0.2em] transition-colors duration-500 ${
-                    i === active ? "text-bone" : "text-mute"
+                    i === active ? "text-bone" : "text-dim"
                   }`}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -133,7 +133,7 @@ export const SlateFocus = ({ projects = [] }) => {
         <Panel key={p.slug} p={p} i={i} active={active === i} onFocus={setActive} />
       ))}
 
-      <div className="py-10 text-center font-mono text-[10px] tracking-[0.3em] text-mute">
+      <div className="py-10 text-center font-mono text-[10px] tracking-[0.3em] text-dim">
         FOCUS ON ONE STORY AT A TIME · EVERY STORY DESERVES YOUR ATTENTION
       </div>
     </div>

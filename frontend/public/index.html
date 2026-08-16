@@ -74,12 +74,16 @@
                 d.style.colorScheme = t;
                 var m = document.querySelector('meta[name="theme-color"]');
                 if (m) m.setAttribute("content", t === "light" ? "#FAF9F6" : "#0C0B0A");
-                if (location.pathname === "/") {
-                    d.setAttribute("data-preboot", "dark");
-                } else {
-                    try {
-                        if (sessionStorage.getItem("bo-intro-seen")) d.setAttribute("data-preboot", "page");
-                    } catch (e) {}
+                // What stands in until React mounts depends on what is coming
+                // next: the splash (so hold its poster), the projection hero
+                // (black, so its lamp is the first thing that appears), or an
+                // ordinary page (its own background).
+                var seen = false;
+                try {
+                    seen = !!sessionStorage.getItem("bo-intro-seen");
+                } catch (e) {}
+                if (seen) {
+                    d.setAttribute("data-preboot", location.pathname === "/" ? "dark" : "page");
                 }
             })();
         </script>

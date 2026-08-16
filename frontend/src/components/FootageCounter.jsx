@@ -26,7 +26,7 @@ export const FootageCounter = () => {
     <div
       data-testid="footage-counter"
       aria-hidden="true"
-      className={`pointer-events-none fixed bottom-5 right-[var(--bo-gutter)] z-[70] hidden items-center gap-2.5 font-mono text-[10px] tracking-[0.22em] text-mute transition-opacity duration-500 md:flex ${
+      className={`pointer-events-none fixed bottom-5 right-[var(--bo-gutter)] z-[70] hidden items-center gap-2.5 font-mono text-[10px] tracking-[0.22em] text-dim transition-opacity duration-500 md:flex ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
