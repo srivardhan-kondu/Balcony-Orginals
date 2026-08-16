@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 
-// The loader owns the screen for roughly the length of the logo animation.
+/* How long the loader holds the screen. The film itself runs 2.33s, so it is
+   played faster rather than cut: a hard stop would leave the wordmark half
+   assembled, where a rate change lands the same finished frame, sooner.
+
+   Derived from the video's own duration at runtime rather than a hardcoded
+   rate, so re-exporting the film at a different length still lands here. */
+const SPLASH_MS = 1500;
+
 // FALLBACK_MS is the backstop: if the video never fires `ended` — blocked
 // autoplay, a codec the browser refuses, a stalled download — the poster
 // frame is already on screen, and we hand over the site anyway.
-const FALLBACK_MS = 2800;
-const ERROR_MS = 1400;
-const FADE_MS = 550;
+const FALLBACK_MS = SPLASH_MS + 400;
+const ERROR_MS = 900;
+const FADE_MS = 400;
+// Reduced motion holds the poster instead of playing anything, and does not
+// need the full beat to do it.
+const REDUCED_MS = 900;
 
 /* The splash owns the screen for its first two seconds. Anything that opens
    with a timed sequence of its own — the projection hero — has to wait for it,
@@ -24,6 +34,15 @@ export const hasIntroPlayed = () => played;
 const announce = () => {
   played = true;
   window.dispatchEvent(new Event(INTRO_DONE));
+};
+
+/** Play the film at whatever rate makes it finish in SPLASH_MS. */
+const fitToBeat = (video) => {
+  const seconds = video?.duration;
+  if (!seconds || !Number.isFinite(seconds)) return;
+  // Clamped: a corrupt or oddly short duration should not send the rate
+  // somewhere the browser refuses to play at.
+  video.playbackRate = Math.min(4, Math.max(0.5, seconds / (SPLASH_MS / 1000)));
 };
 
 export const Intro = () => {
@@ -56,10 +75,13 @@ export const Intro = () => {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const v = vidRef.current;
-    if (v && !reduced) v.play().catch(() => {});
+    if (v && !reduced) {
+      fitToBeat(v);
+      v.play().catch(() => {});
+    }
 
     // Reduced motion still gets the mark, just held as a still rather than animated.
-    const t = setTimeout(() => end(), reduced ? 1100 : FALLBACK_MS);
+    const t = setTimeout(() => end(), reduced ? REDUCED_MS : FALLBACK_MS);
     const onKey = (e) => e.key === "Escape" && end();
     window.addEventListener("keydown", onKey);
 
@@ -102,6 +124,7 @@ export const Intro = () => {
           without needing a separate mobile cut. */}
       <video
         ref={vidRef}
+        onLoadedMetadata={(e) => fitToBeat(e.currentTarget)}
         src="/assets/splash.mp4"
         poster="/assets/splash-poster.jpg"
         autoPlay
