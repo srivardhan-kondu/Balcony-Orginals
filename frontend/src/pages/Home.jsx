@@ -144,7 +144,7 @@ export default function Home() {
                 root system; the stories are free to travel.
               </p>
               <div className="mt-10">
-                <div className="font-mono text-[10px] tracking-[0.24em] text-mute">
+                <div className="font-mono text-[10px] tracking-[0.24em] text-dim">
                   RAYALASEEMA → ANDHRA PRADESH → INDIA → WORLD
                 </div>
                 <motion.div
@@ -352,7 +352,7 @@ export default function Home() {
             <div className="font-telugu text-[clamp(26px,3vw,40px)] leading-[1.5] text-gold/90">
               ప్రతి కథ ఒక రత్నం
             </div>
-            <div className="mt-3 font-mono text-[10px] tracking-[0.24em] text-mute">
+            <div className="mt-3 font-mono text-[10px] tracking-[0.24em] text-dim">
               EVERY STORY IS A GEM
             </div>
           </Reveal>
@@ -360,7 +360,7 @@ export default function Home() {
             <p className="font-serif text-[clamp(20px,2.2vw,30px)] leading-[1.5] text-bone">
               <ScrollFill text="We believe a story doesn't need permission to matter — it needs a patient camera, an honest edit, and someone willing to carry it. Balcony Originals exists to be that someone: to preserve stories, produce stories, and give strong stories a chance to travel." />
             </p>
-            <div className="mt-8 font-mono text-[10.5px] tracking-[0.22em] text-mute">
+            <div className="mt-8 font-mono text-[10.5px] tracking-[0.22em] text-dim">
               — BALCONY ORIGINALS · PRODUCTION PHILOSOPHY
             </div>
           </Reveal>

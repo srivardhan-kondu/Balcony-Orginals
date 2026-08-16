@@ -201,7 +201,7 @@ export const Header = () => {
                 </Link>
               </motion.div>
             </nav>
-            <div className="flex-none font-mono text-[10px] tracking-[0.18em] text-mute">
+            <div className="flex-none font-mono text-[10px] tracking-[0.18em] text-dim">
               RAYALASEEMA · ANDHRA PRADESH · INDIA
             </div>
           </motion.div>

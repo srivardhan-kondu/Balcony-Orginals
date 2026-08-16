@@ -127,10 +127,10 @@ export const FilmRibbon = () => {
     >
       <div ref={mountRef} className="absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink via-transparent to-ink" />
-      <div className="pointer-events-none absolute bottom-5 left-[var(--bo-gutter)] font-mono text-[10px] tracking-[0.26em] text-mute">
+      <div className="pointer-events-none absolute bottom-5 left-[var(--bo-gutter)] font-mono text-[10px] tracking-[0.26em] text-dim">
         EVERY FRAME, A PLACE · 35 MM
       </div>
-      <div className="pointer-events-none absolute right-[var(--bo-gutter)] top-5 font-mono text-[10px] tracking-[0.26em] text-mute">
+      <div className="pointer-events-none absolute right-[var(--bo-gutter)] top-5 font-mono text-[10px] tracking-[0.26em] text-dim">
         SCROLL ROLLS THE FILM
       </div>
     </section>
