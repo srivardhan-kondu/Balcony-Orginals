@@ -4,6 +4,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, Play } from "lucide-react";
 import { api, STATUS_LABELS } from "@/lib/api";
 import { Reveal, MaskLines } from "@/components/Motion";
+import { MotionStill, Still } from "@/components/Still";
+import { SIZES } from "@/lib/images";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
 import NotFound from "@/pages/NotFound";
@@ -56,7 +58,7 @@ export default function ProjectDetail() {
   if (!project)
     return (
       <div className="flex min-h-screen items-center justify-center" data-testid="project-loading">
-        <span className="font-mono text-[11px] tracking-[0.3em] text-bone/40">LOADING…</span>
+        <span className="font-mono text-[11px] tracking-[0.3em] text-mute">LOADING…</span>
       </div>
     );
 
@@ -71,22 +73,29 @@ export default function ProjectDetail() {
     <div data-testid={`project-detail-${project.slug}`}>
       {/* Hero */}
       <section ref={heroRef} className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden">
-        <motion.img
+        <MotionStill
           src={project.hero}
           alt={project.title}
+          sizes={SIZES.full}
+          portrait
+          fetchPriority="high"
           style={{ y: heroY, scale: heroScale }}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/25 to-ink" />
-        <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-gold/40" />
-        <span aria-hidden="true" className="absolute right-[26px] top-[96px] h-9 w-9 border-r border-t border-gold/40" />
+        {/* These ticks frame the content column, so they belong on the same
+            gutter it does — pinned at a literal 26px they sat inside the column
+            edge at every width above a phone, and at a literal 96px they crossed
+            the bar on any viewport where it is shorter than that. */}
+        <span aria-hidden="true" className="absolute left-[var(--bo-gutter)] top-[calc(var(--bo-header-h)+clamp(14px,2vh,22px))] h-9 w-9 border-l border-t border-gold/40" />
+        <span aria-hidden="true" className="absolute right-[var(--bo-gutter)] top-[calc(var(--bo-header-h)+clamp(14px,2vh,22px))] h-9 w-9 border-r border-t border-gold/40" />
 
-        <div className="relative mx-auto w-full max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(30px,5vh,60px)] pt-40">
+        <div className="relative mx-auto w-full max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(30px,5vh,60px)] pt-[calc(var(--bo-header-h)+clamp(48px,9vh,104px))]">
           <Reveal>
             <Link
               to="/works"
               data-testid="detail-back-link"
-              className="mb-8 inline-flex items-center gap-2.5 font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone/60 transition-colors hover:text-gold"
+              className="mb-6 inline-flex items-center gap-2.5 py-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone/60 transition-colors hover:text-gold"
             >
               <ArrowLeft size={13} /> All stories
             </Link>
@@ -111,7 +120,7 @@ export default function ProjectDetail() {
               {(project.categories || []).map((c) => (
                 <span
                   key={c}
-                  className="rounded-sm border border-bone/15 px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-[0.18em] text-bone/55"
+                  className="rounded-sm border border-bone/15 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-mute"
                 >
                   {c}
                 </span>
@@ -139,7 +148,7 @@ export default function ProjectDetail() {
       </section>
 
       {/* Synopsis */}
-      <section className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(60px,9vh,110px)]">
+      <section className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(60px,9vh,110px)]">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr]">
           <Reveal>
             <div className="flex items-center gap-3">
@@ -159,7 +168,7 @@ export default function ProjectDetail() {
       </section>
 
       {/* Chapters */}
-      <section className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(60px,9vh,110px)]">
+      <section className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(60px,9vh,110px)]">
         <Chapter n="01" title="The Story" body={project.story} testid="detail-story" />
         <Chapter n="02" title="The Place" body={project.place} testid="detail-place" />
         <Chapter n="03" title="The People" body={project.people} testid="detail-people" />
@@ -167,7 +176,7 @@ export default function ProjectDetail() {
 
       {/* Gallery */}
       {project.gallery && project.gallery.length > 0 && (
-        <section data-testid="detail-gallery" className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(60px,9vh,110px)]">
+        <section data-testid="detail-gallery" className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(60px,9vh,110px)]">
           <Reveal>
             <h2 className="font-serif text-[clamp(22px,2.6vw,38px)] text-bone">Gallery</h2>
           </Reveal>
@@ -175,10 +184,12 @@ export default function ProjectDetail() {
             {project.gallery.map((g, i) => (
               <Reveal key={g + i} delay={i * 0.08}>
                 <div className="group overflow-hidden rounded-sm border border-line" style={{ aspectRatio: "16/10" }}>
-                  <img
+                  <Still
                     src={g}
                     alt={`${project.title} — still ${i + 1}`}
+                    sizes={SIZES.grid3}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
                   />
                 </div>
@@ -191,7 +202,7 @@ export default function ProjectDetail() {
       {/* Credits */}
       {project.credits && project.credits.length > 0 && (
         <section data-testid="detail-credits" className="border-t border-line bg-ink2/40">
-          <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(60px,9vh,100px)]">
+          <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(60px,9vh,100px)]">
             <Reveal>
               <h2 className="font-serif text-[clamp(22px,2.6vw,38px)] text-bone">Credits</h2>
             </Reveal>
@@ -199,7 +210,7 @@ export default function ProjectDetail() {
               {project.credits.map((c, i) => (
                 <Reveal key={c.role} delay={i * 0.06}>
                   <div className="flex flex-wrap items-baseline justify-between gap-3 border-t border-line py-5 last:border-b">
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-bone/50">{c.role}</span>
+                    <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-mute">{c.role}</span>
                     <span className="font-serif text-lg text-bone/90">{c.name}</span>
                   </div>
                 </Reveal>
@@ -212,7 +223,7 @@ export default function ProjectDetail() {
       {/* Partnership CTA for in-development */}
       {project.confidential && (
         <section data-testid="detail-partnership" className="border-t border-line">
-          <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(70px,10vh,120px)] text-center">
+          <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(70px,10vh,120px)] text-center">
             <Reveal>
               <h2 className="mx-auto max-w-[22ch] font-serif text-[clamp(26px,3.6vw,50px)] leading-[1.1] text-bone">
                 Producing, co-producing or backing rooted cinema?
@@ -232,7 +243,7 @@ export default function ProjectDetail() {
       {/* Related */}
       {related.length > 0 && (
         <section data-testid="detail-related" className="border-t border-line">
-          <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(60px,9vh,110px)]">
+          <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(60px,9vh,110px)]">
             <Reveal>
               <h2 className="font-serif text-[clamp(22px,2.6vw,38px)] text-bone">Related stories</h2>
             </Reveal>

@@ -48,6 +48,17 @@
             html.light[data-preboot="page"] #bo-preboot {
                 background: #faf9f6;
             }
+            /* Home opens on the projection hero, whose first beat is an empty
+               black screen. Standing in with the brand mark here would put a
+               logo on that screen before the lamp has struck — so home pre-boots
+               to flat black, in either theme, and the first thing that appears
+               is the light. */
+            html[data-preboot="dark"] #bo-preboot {
+                background: #050505;
+            }
+            html[data-preboot="dark"] #bo-preboot img {
+                display: none;
+            }
         </style>
         <!-- Theme, applied before first paint. Without this the page paints in
              the default theme and then corrects itself once React mounts. -->
@@ -63,9 +74,13 @@
                 d.style.colorScheme = t;
                 var m = document.querySelector('meta[name="theme-color"]');
                 if (m) m.setAttribute("content", t === "light" ? "#FAF9F6" : "#0C0B0A");
-                try {
-                    if (sessionStorage.getItem("bo-intro-seen")) d.setAttribute("data-preboot", "page");
-                } catch (e) {}
+                if (location.pathname === "/") {
+                    d.setAttribute("data-preboot", "dark");
+                } else {
+                    try {
+                        if (sessionStorage.getItem("bo-intro-seen")) d.setAttribute("data-preboot", "page");
+                    } catch (e) {}
+                }
             })();
         </script>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>

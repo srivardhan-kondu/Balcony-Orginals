@@ -16,7 +16,7 @@ const SUBJECTS = [
 
 const inputCls =
   "w-full border-b border-line bg-transparent py-3 text-[15px] text-bone placeholder:text-dim outline-none transition-colors duration-300 focus:border-gold";
-const labelCls = "mb-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/50";
+const labelCls = "mb-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-mute";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: SUBJECTS[0], message: "", website: "" });
@@ -61,11 +61,11 @@ export default function Contact() {
         sub="Collaborations, partnerships, press, or a story that won't leave you alone — this is the door."
       />
 
-      <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(80px,12vh,150px)]">
+      <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(80px,12vh,150px)]">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <div className="lg:sticky lg:top-32">
-              <div className="font-mono text-[10.5px] leading-[2.2] tracking-[0.2em] text-bone/50">
+              <div className="font-mono text-[10.5px] leading-[2.2] tracking-[0.2em] text-mute">
                 BALCONY ORIGINALS
                 <br />
                 RAYALASEEMA · ANDHRA PRADESH

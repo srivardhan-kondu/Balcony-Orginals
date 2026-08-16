@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
+import { useSiteChromeVisible } from "@/hooks/use-past-hero";
 
 export const FootageCounter = () => {
   const ref = useRef(null);
+  /* The projection hero has its own readout in the same corner — two footage
+     counters printed over each other is worse than either. */
+  const visible = useSiteChromeVisible();
 
   useEffect(() => {
     let raf;
@@ -22,7 +26,9 @@ export const FootageCounter = () => {
     <div
       data-testid="footage-counter"
       aria-hidden="true"
-      className="pointer-events-none fixed bottom-5 right-[clamp(18px,4vw,58px)] z-[70] hidden items-center gap-2.5 font-mono text-[9.5px] tracking-[0.22em] text-bone/35 md:flex"
+      className={`pointer-events-none fixed bottom-5 right-[var(--bo-gutter)] z-[70] hidden items-center gap-2.5 font-mono text-[10px] tracking-[0.22em] text-mute transition-opacity duration-500 md:flex ${
+        visible ? "opacity-100" : "opacity-0"
+      }`}
     >
       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-bone/50" />
       <span ref={ref}>FTG 0000 · FR 000000</span>

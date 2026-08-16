@@ -17,21 +17,30 @@ const filterFallback = (params = {}) => {
   return list;
 };
 
+const fallbackProject = (slug) => {
+  const p = PROJECTS_FALLBACK.find((x) => x.slug === slug);
+  if (!p) throw new Error("not found");
+  return p;
+};
+
+/* A 200 is not proof of an API. `vercel.json` rewrites every unmatched path to
+   index.html, so with REACT_APP_BACKEND_URL unset at build time the request for
+   /api/projects resolves — with the HTML page as its body. That sailed past the
+   `.catch` and only failed later, on `projects.filter(...)`, taking the whole
+   page down with it. Shape is checked here so a wrong answer falls back like a
+   missing one. */
 export const api = {
   projects: (params) =>
     axios
       .get(`${API}/projects`, { params })
-      .then((r) => r.data)
+      .then((r) => (Array.isArray(r.data) ? r.data : filterFallback(params)))
       .catch(() => filterFallback(params)),
   project: (slug) =>
     axios
       .get(`${API}/projects/${slug}`)
-      .then((r) => r.data)
-      .catch(() => {
-        const p = PROJECTS_FALLBACK.find((x) => x.slug === slug);
-        if (!p) throw new Error("not found");
-        return p;
-      }),
+      .then((r) => (r.data && typeof r.data === "object" && r.data.slug ? r.data : null))
+      .catch(() => null)
+      .then((p) => p || fallbackProject(slug)),
   submitStory: (data) => axios.post(`${API}/story-submissions`, data).then((r) => r.data),
   contact: (data) => axios.post(`${API}/contact`, data).then((r) => r.data),
 };

@@ -1,19 +1,12 @@
-import { useEffect } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
+import { useOverlay } from "@/hooks/use-overlay";
 
 export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.documentElement.style.overflow = "";
-    };
-  }, [open, onClose]);
+  const ref = useRef(null);
+  // Scroll lock, Lenis, Escape, and the focus trap — see use-overlay.
+  useOverlay(open, onClose, ref);
 
   if (!open) return null;
 
@@ -21,16 +14,30 @@ export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
   // invert/screen filter on the video only reads against a dark ground.
   return createPortal(
     <div
+      ref={ref}
       data-testid="reel-modal"
       onClick={onClose}
+      tabIndex={-1}
       className="bo-dark fixed inset-0 z-[150] flex cursor-pointer items-center justify-center bg-scrim/95 p-[clamp(20px,5vw,80px)]"
       role="dialog"
-      aria-label="Video player"
+      aria-modal="true"
+      aria-label={`Video player — ${label}`}
     >
-      <div className="w-[min(1000px,92vw)]">
-        <div className="mb-3.5 flex items-end justify-between">
-          <span className="font-mono text-[10.5px] tracking-[0.2em] text-bone/45">{label}</span>
-          <span className="text-[11px] uppercase tracking-[0.16em] text-bone/50">Click anywhere to close</span>
+      <div className="w-[min(1000px,92vw)]" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-3.5 flex items-end justify-between gap-4">
+          <span className="font-mono text-[10.5px] tracking-[0.2em] text-mute">{label}</span>
+          {/* Click-anywhere was the only way out, which is no way out from a
+              keyboard. Escape closes it too; this is the visible affordance. */}
+          <button
+            type="button"
+            onClick={onClose}
+            data-testid="reel-close-btn"
+            aria-label="Close video"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-sm border border-bone/25 px-3 text-[11px] uppercase tracking-[0.16em] text-bone/80 transition-colors hover:border-gold hover:text-gold"
+          >
+            <X size={13} />
+            Close
+          </button>
         </div>
         <video
           src="/assets/balcony-intro.mp4"
@@ -38,8 +45,7 @@ export const ReelModal = ({ open, onClose, label = "BRAND FILM" }) => {
           autoPlay
           controls
           playsInline
-          onClick={(e) => e.stopPropagation()}
-          className="block w-full bg-ink"
+          className="block w-full cursor-auto bg-ink"
           style={{ filter: "invert(1) brightness(.97) contrast(1.9)", mixBlendMode: "screen" }}
           data-testid="reel-video"
         />

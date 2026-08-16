@@ -8,8 +8,36 @@ const FALLBACK_MS = 2800;
 const ERROR_MS = 1400;
 const FADE_MS = 550;
 
+/* The splash owns the screen for its first two seconds. Anything that opens
+   with a timed sequence of its own — the projection hero — has to wait for it,
+   or it plays to a covered screen and is over before anyone sees it. Fired once
+   the splash has faded, and immediately on visits where it never shows. */
+export const INTRO_DONE = "bo:intro-done";
+
+/* The event fires exactly once per page load, but the hero mounts every time
+   the reader arrives at `/` — including on the way back from another route,
+   long after the splash is done. A latch as well as an event, so a component
+   that was not listening at the time can still ask. */
+let played = false;
+export const hasIntroPlayed = () => played;
+
+const announce = () => {
+  played = true;
+  window.dispatchEvent(new Event(INTRO_DONE));
+};
+
 export const Intro = () => {
+  /* Not on the home page. The projection hero opens with black, then the lamp,
+     then the type — it *is* the entrance there, and playing a brand-film splash
+     first makes two logo animations back to back and means the home screen no
+     longer starts on black. Every other route still gets the splash once per
+     session. Read once, on mount, so a later navigation cannot pull the splash
+     up over a page that is already open. */
+  const [onHome] = useState(() =>
+    typeof window !== "undefined" ? window.location.pathname === "/" : false
+  );
   const [show, setShow] = useState(() => {
+    if (onHome) return false;
     try {
       return !sessionStorage.getItem("bo-intro-seen");
     } catch {
@@ -21,7 +49,11 @@ export const Intro = () => {
   const ended = useRef(false);
 
   useEffect(() => {
-    if (!show) return;
+    if (!show) {
+      // Second visit onward: nothing is covering the page, so release at once.
+      announce();
+      return;
+    }
 
     const html = document.documentElement;
     const prevOverflow = html.style.overflow;
@@ -54,6 +86,7 @@ export const Intro = () => {
     setTimeout(() => {
       setShow(false);
       document.documentElement.style.overflow = "";
+      announce();
     }, FADE_MS);
   };
 
@@ -88,7 +121,7 @@ export const Intro = () => {
 
       <div className="mt-[clamp(14px,3vh,30px)] flex flex-col items-center gap-[clamp(12px,2.4vh,20px)] px-8">
         <span aria-hidden="true" className="h-px w-[52px] bg-bone/25" />
-        <p className="max-w-[290px] text-center font-mono text-[9.5px] uppercase leading-[2.1] tracking-[0.26em] text-bone/45 sm:max-w-none sm:text-[10.5px] sm:tracking-[0.3em]">
+        <p className="max-w-[290px] text-center font-mono text-[10px] uppercase leading-[2.1] tracking-[0.26em] text-mute sm:max-w-none sm:text-[10.5px] sm:tracking-[0.3em]">
           Stories rooted in culture. Told for the world.
         </p>
       </div>

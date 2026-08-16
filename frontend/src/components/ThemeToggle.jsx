@@ -25,7 +25,8 @@ export const ThemeToggle = ({ className = "", testId = "theme-toggle" }) => {
       onClick={() => setTheme(next)}
       aria-label={`Switch to ${next} theme`}
       title={`Switch to ${next} theme`}
-      className={`inline-flex items-center justify-center rounded-sm border border-bone/20 p-2.5 text-bone/80 transition-colors duration-200 hover:border-gold/60 hover:text-gold ${className}`}
+      /* The icon stays 15px; the hit box grows to the 44px minimum around it. */
+      className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-sm border border-bone/20 text-bone/80 transition-colors duration-200 hover:border-gold/60 hover:text-gold ${className}`}
     >
       <Icon aria-hidden="true" className="h-[15px] w-[15px]" style={{ opacity: mounted ? 1 : 0 }} />
     </button>

@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useInView } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { StatusChip } from "@/components/ProjectCard";
+import { Still } from "@/components/Still";
+import { SIZES } from "@/lib/images";
 
 const DOT = 76;
 
@@ -18,7 +20,11 @@ const Panel = ({ p, i, active, onFocus }) => {
       ref={ref}
       data-testid={`slate-panel-${p.slug}`}
       data-active={active}
-      className="relative flex min-h-[88svh] items-center border-t border-line last:border-b"
+      /* 88svh is a frame for one story, not a floor to be met at any cost: on a
+         short viewport it forces the panel taller than the screen and the
+         image below the fold. Under `short:` the panel takes the height its
+         content needs. */
+      className="relative flex min-h-[88svh] items-center border-t border-line last:border-b short:min-h-0"
     >
       <div
         className={`grid w-full items-center gap-10 py-14 transition-opacity duration-700 lg:grid-cols-[1fr_1.15fr] lg:pl-14 ${
@@ -26,7 +32,7 @@ const Panel = ({ p, i, active, onFocus }) => {
         }`}
       >
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-bone/50">
+          <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-mute">
             {p.type === "feature" ? "Feature film" : "Documentary"}
           </div>
           <div className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2">
@@ -41,7 +47,7 @@ const Panel = ({ p, i, active, onFocus }) => {
               {p.title}
             </h3>
           </div>
-          <div className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-bone/50">
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-mute">
             {[p.location, p.state, p.year].filter(Boolean).join(" · ")}
           </div>
           <p className="mt-5 max-w-[46ch] text-[15px] leading-relaxed text-mute">{p.logline}</p>
@@ -69,10 +75,12 @@ const Panel = ({ p, i, active, onFocus }) => {
           style={{ aspectRatio: "16/9" }}
         >
           <Link to={`/projects/${p.slug}`} tabIndex={-1} aria-label={`Open ${p.title}`}>
-            <img
+            <Still
               src={p.hero}
               alt={p.title}
+              sizes={SIZES.slate}
               loading="lazy"
+              decoding="async"
               className={`h-full w-full object-cover transition-all [transition-duration:1200ms] ${
                 active ? "scale-100 opacity-100 grayscale-0" : "scale-[1.07] opacity-60 grayscale"
               }`}
@@ -110,7 +118,7 @@ export const SlateFocus = ({ projects = [] }) => {
                 />
                 <span
                   className={`font-mono text-[10px] tracking-[0.2em] transition-colors duration-500 ${
-                    i === active ? "text-bone" : "text-bone/30"
+                    i === active ? "text-bone" : "text-mute"
                   }`}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -125,7 +133,7 @@ export const SlateFocus = ({ projects = [] }) => {
         <Panel key={p.slug} p={p} i={i} active={active === i} onFocus={setActive} />
       ))}
 
-      <div className="py-10 text-center font-mono text-[9.5px] tracking-[0.3em] text-bone/35">
+      <div className="py-10 text-center font-mono text-[10px] tracking-[0.3em] text-mute">
         FOCUS ON ONE STORY AT A TIME · EVERY STORY DESERVES YOUR ATTENTION
       </div>
     </div>

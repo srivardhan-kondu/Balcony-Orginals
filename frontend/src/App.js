@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import Lenis from "lenis";
 import { Toaster } from "@/components/ui/sonner";
 import { Grain } from "@/components/Grain";
@@ -10,7 +11,6 @@ import { Intro } from "@/components/Intro";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FootageCounter } from "@/components/FootageCounter";
 import { ClapperTransition } from "@/components/ClapperTransition";
-import { CursorPreview } from "@/components/CursorPreview";
 import Home from "@/pages/Home";
 import Works from "@/pages/Works";
 import ProjectDetail from "@/pages/ProjectDetail";
@@ -60,6 +60,13 @@ function App() {
   }, []);
 
   return (
+    /* The stylesheet's reduced-motion block can only reach CSS animation and
+       transition. Every reveal, masked headline, parallax and card tilt on this
+       site is a framer-motion transform, which that block cannot touch —
+       `reducedMotion="user"` is what actually holds them still, by making the
+       library drop transform and layout animations while keeping opacity, so
+       nothing is left invisible mid-reveal. */
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-ink text-bone">
       <BrowserRouter>
         <Grain />
@@ -83,10 +90,10 @@ function App() {
         <Footer />
         <FootageCounter />
         <ClapperTransition />
-        <CursorPreview />
         <Toaster position="bottom-right" />
       </BrowserRouter>
     </div>
+    </MotionConfig>
   );
 }
 

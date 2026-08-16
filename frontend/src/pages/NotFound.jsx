@@ -24,7 +24,7 @@ export default function NotFound() {
         <MaskLines lines={["This story hasn't", "been told yet."]} delay={0.1} lastClassName="text-sand" />
       </h1>
       <Reveal delay={0.45}>
-        <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.24em] text-bone/45">
+        <p className="mt-6 font-mono text-[10.5px] uppercase tracking-[0.24em] text-mute">
           SCENE NOT FOUND · REEL MISLABELLED
         </p>
         <Link

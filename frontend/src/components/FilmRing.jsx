@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
+import { Still } from "@/components/Still";
+import { SIZES } from "@/lib/images";
 import { getAudioContext, getMaster, isSoundEnabled, setSoundEnabled, subscribeSound } from "@/lib/sound";
 
 export const FilmRing = ({ projects = [] }) => {
@@ -194,12 +196,25 @@ export const FilmRing = ({ projects = [] }) => {
               }}
             >
               <div className="relative h-full w-full overflow-hidden rounded-sm border border-line bg-ink2 shadow-lift">
-                <img src={p.hero} alt={p.title} draggable={false} className="h-full w-full object-cover" />
+                {/* The ring shows every project twice and each panel again as a
+                    floor reflection, so one master used to be decoded four times
+                    over at 1584px to fill a panel 230px wide on a phone. Same
+                    URL, so the network only saw it once — but each decode is its
+                    own bitmap in memory. */}
+                <Still
+                  src={p.hero}
+                  alt={p.title}
+                  sizes={SIZES.ring}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  className="h-full w-full object-cover"
+                />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
                 <span aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 border-l border-t border-bone/40" />
                 <span aria-hidden="true" className="pointer-events-none absolute right-3 top-3 h-4 w-4 border-r border-t border-bone/40" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5 md:p-5">
-                  <div className="font-mono text-[8.5px] uppercase tracking-[0.22em] text-bone/65 md:text-[10px]">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/75">
                     {STATUS_LABELS[p.status] || p.status}
                   </div>
                   <div className="mt-1 font-display text-[15px] font-bold uppercase leading-tight tracking-tight text-bone md:mt-1.5 md:text-2xl">
@@ -217,7 +232,14 @@ export const FilmRing = ({ projects = [] }) => {
                   maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 80%)",
                 }}
               >
-                <img src={p.hero} alt="" draggable={false} className="h-full w-full object-cover" />
+                <Still
+                  src={p.hero}
+                  sizes={SIZES.ring}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
           ))}
@@ -227,16 +249,17 @@ export const FilmRing = ({ projects = [] }) => {
       <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
         <span
           data-testid="film-ring-hint"
-          className="font-mono text-[10px] uppercase tracking-[0.3em] text-bone/40"
+          className="text-center font-mono text-[10px] uppercase tracking-[0.3em] text-mute"
         >
-          Drag to rotate · scroll turns the reel · {projects.length} featured stories
+          Drag to rotate · scroll turns the reel ·{" "}
+          {projects.length === 1 ? "1 featured story" : `${projects.length} featured stories`}
         </span>
         <button
           data-testid="film-ring-sound-toggle"
           onClick={toggleSound}
           aria-pressed={soundOn}
           aria-label={soundOn ? "Mute reel sound" : "Enable reel sound"}
-          className="inline-flex items-center gap-2 rounded-sm border border-line px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-bone/50 transition-colors duration-300 hover:border-bone/40 hover:text-bone"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-line px-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-mute transition-colors duration-300 hover:border-bone/40 hover:text-bone"
         >
           {soundOn ? <Volume2 size={11} /> : <VolumeX size={11} />}
           {soundOn ? "Reel sound on" : "Reel sound off"}
