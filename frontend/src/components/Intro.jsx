@@ -59,6 +59,16 @@ export const Intro = () => {
     }
   });
   const [fading, setFading] = useState(false);
+  /* Under reduced motion the film is never played, so the poster frame is the
+     whole splash — it is the one case where a still is right. */
+  const [reduced] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+  /* Everywhere else the video stays invisible until it is actually running.
+     A <video> paints its first decoded frame as soon as it has one, so without
+     this the mark appears, freezes while the rest buffers, and only then
+     moves — read as "a static image, then the video". */
+  const [rolling, setRolling] = useState(false);
   const vidRef = useRef(null);
   const ended = useRef(false);
 
@@ -73,7 +83,6 @@ export const Intro = () => {
     const prevOverflow = html.style.overflow;
     html.style.overflow = "hidden";
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const v = vidRef.current;
     if (v && !reduced) {
       fitToBeat(v);
@@ -125,15 +134,20 @@ export const Intro = () => {
       <video
         ref={vidRef}
         onLoadedMetadata={(e) => fitToBeat(e.currentTarget)}
+        onPlaying={() => setRolling(true)}
         src="/assets/splash.mp4"
-        poster="/assets/splash-poster.jpg"
-        autoPlay
+        poster={reduced ? "/assets/splash-poster.jpg" : undefined}
+        // The attribute plays the film on its own, so the effect's conditional
+        // play() was never what held it still: under reduced motion it
+        // autoplayed regardless.
+        autoPlay={!reduced}
         muted
         playsInline
         preload="auto"
         aria-hidden="true"
         onEnded={end}
         onError={() => setTimeout(end, ERROR_MS)}
+        style={{ opacity: reduced || rolling ? 1 : 0 }}
         className="w-[150vw] max-h-[62vh] max-w-none shrink-0 object-contain sm:w-[min(86vw,720px)]"
       />
 

@@ -7,7 +7,6 @@
         <meta name="description" content="Balcony Originals — Stories rooted in culture. Told for the world. Documentaries, feature films and original stories from Rayalaseema, India." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preload" as="image" href="/assets/splash-poster.jpg" />
         <!--
         manifest.json provides metadata used when your web app is installed on a
         user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -22,42 +21,27 @@
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
         <title>Balcony Originals — Stories rooted in culture. Told for the world.</title>
-        <!-- The pre-boot screen paints before the CSS bundle exists, so its two
-             background values are literals here rather than theme tokens. -->
+        <!-- The pre-boot screen paints before the CSS bundle exists, so its
+             background values are literals here rather than theme tokens.
+
+             It holds black and nothing else. It used to stand in with the
+             splash poster, which meant the still was painted here, then painted
+             again as the video's own poster, and only then did the film start —
+             the mark appearing twice as a freeze-frame before it ever moved.
+             Black straight through to the first frame of video reads as one
+             thing rather than three. -->
         <style>
             #bo-preboot {
                 position: fixed;
                 inset: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #000;
-            }
-            #bo-preboot img {
-                width: min(150vw, 720px);
-                max-width: none;
+                background: #050505;
             }
             /* Second visit onward the splash is skipped, so stand in for the
-               page instead of for the black splash that is no longer coming. */
-            html[data-preboot="page"] #bo-preboot {
-                background: #050505;
-            }
-            html[data-preboot="page"] #bo-preboot img {
-                display: none;
-            }
+               page instead of for a splash that is no longer coming. Home is
+               excluded: it opens on the projection hero, whose first beat is an
+               empty black screen in either theme. */
             html.light[data-preboot="page"] #bo-preboot {
                 background: #faf9f6;
-            }
-            /* Home opens on the projection hero, whose first beat is an empty
-               black screen. Standing in with the brand mark here would put a
-               logo on that screen before the lamp has struck — so home pre-boots
-               to flat black, in either theme, and the first thing that appears
-               is the light. */
-            html[data-preboot="dark"] #bo-preboot {
-                background: #050505;
-            }
-            html[data-preboot="dark"] #bo-preboot img {
-                display: none;
             }
         </style>
         <!-- Theme, applied before first paint. Without this the page paints in
@@ -74,16 +58,15 @@
                 d.style.colorScheme = t;
                 var m = document.querySelector('meta[name="theme-color"]');
                 if (m) m.setAttribute("content", t === "light" ? "#FAF9F6" : "#0C0B0A");
-                // What stands in until React mounts depends on what is coming
-                // next: the splash (so hold its poster), the projection hero
-                // (black, so its lamp is the first thing that appears), or an
-                // ordinary page (its own background).
+                // The stand-in is black unless an ordinary page is coming:
+                // the splash is black, and home's projection hero opens on
+                // black, so in both of those cases black IS the first frame.
                 var seen = false;
                 try {
                     seen = !!sessionStorage.getItem("bo-intro-seen");
                 } catch (e) {}
-                if (seen) {
-                    d.setAttribute("data-preboot", location.pathname === "/" ? "dark" : "page");
+                if (seen && location.pathname !== "/") {
+                    d.setAttribute("data-preboot", "page");
                 }
             })();
         </script>
@@ -95,13 +78,10 @@
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        <!-- Pre-boot state. React replaces this the moment it mounts; until
-             then the brand mark stands in for the splash, so a slow bundle
-             shows the logo rather than an empty black screen. -->
+        <!-- Pre-boot state. React replaces this the moment it mounts. Empty
+             on purpose — see the note on #bo-preboot above. -->
         <div id="root">
-            <div id="bo-preboot">
-                <img src="/assets/splash-poster.jpg" alt="Balcony Originals" />
-            </div>
+            <div id="bo-preboot"></div>
         </div>
         <!--
       This HTML file is a template.
