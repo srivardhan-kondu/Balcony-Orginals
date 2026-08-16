@@ -27,17 +27,12 @@ const announce = () => {
 };
 
 export const Intro = () => {
-  /* Not on the home page. The projection hero opens with black, then the lamp,
-     then the type — it *is* the entrance there, and playing a brand-film splash
-     first makes two logo animations back to back and means the home screen no
-     longer starts on black. Every other route still gets the splash once per
-     session. Read once, on mount, so a later navigation cannot pull the splash
-     up over a page that is already open. */
-  const [onHome] = useState(() =>
-    typeof window !== "undefined" ? window.location.pathname === "/" : false
-  );
+  /* The loader, on every route including home: splash.mp4 holds the screen,
+     fades, and only then does the page underneath begin. On home that page is
+     the projection hero, which starts from black — so the hand-off reads as
+     one continuous entrance rather than two competing intros.
+     Once per session, as before. */
   const [show, setShow] = useState(() => {
-    if (onHome) return false;
     try {
       return !sessionStorage.getItem("bo-intro-seen");
     } catch {
