@@ -44,6 +44,64 @@ const makeNoiseBuffer = (c, seconds) => {
   return buffer;
 };
 
+/* A xenon projector lamp striking: the relay clunks, the arc catches and
+   brightens, then the transport settles to 24fps and dies away. Fired the
+   instant the beam appears.
+
+   The original design opened its own AudioContext and armed a gesture listener
+   to get around autoplay blocking. Here it goes through the shared context and
+   the site-wide sound preference instead — one mute switch for the whole site,
+   and no audio before the visitor has asked for any. */
+export const playLamp = () => {
+  if (!enabled) return;
+  const c = getAudioContext();
+  if (!c || !master || c.state !== "running") return;
+  const t = c.currentTime + 0.02;
+
+  const relay = c.createOscillator();
+  relay.type = "sine";
+  relay.frequency.setValueAtTime(150, t);
+  relay.frequency.exponentialRampToValueAtTime(46, t + 0.2);
+  const rg = c.createGain();
+  rg.gain.setValueAtTime(0.0001, t);
+  rg.gain.exponentialRampToValueAtTime(0.42, t + 0.01);
+  rg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+  relay.connect(rg);
+  rg.connect(master);
+  relay.start(t);
+  relay.stop(t + 0.32);
+
+  const arc = c.createBufferSource();
+  arc.buffer = makeNoiseBuffer(c, 2);
+  const bp = c.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.Q.value = 0.9;
+  bp.frequency.setValueAtTime(320, t);
+  bp.frequency.exponentialRampToValueAtTime(2600, t + 0.18);
+  bp.frequency.exponentialRampToValueAtTime(700, t + 1.1);
+  const ag = c.createGain();
+  ag.gain.setValueAtTime(0.0001, t);
+  ag.gain.exponentialRampToValueAtTime(0.3, t + 0.06);
+  ag.gain.exponentialRampToValueAtTime(0.0001, t + 1.9);
+
+  // 24Hz tremolo on the arc — the shutter, felt rather than heard.
+  const flutter = c.createOscillator();
+  flutter.type = "triangle";
+  flutter.frequency.value = 24;
+  const fAmt = c.createGain();
+  fAmt.gain.value = 0.12;
+  flutter.connect(fAmt);
+  fAmt.connect(ag.gain);
+
+  arc.connect(bp);
+  bp.connect(ag);
+  ag.connect(master);
+  arc.start(t);
+  arc.stop(t + 2);
+  flutter.start(t);
+  flutter.stop(t + 2);
+};
+
 export const playClap = () => {
   if (!enabled) return;
   const c = getAudioContext();

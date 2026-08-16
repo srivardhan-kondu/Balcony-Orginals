@@ -28,9 +28,9 @@ export default function Upcoming() {
         sub="A production slate, not a waiting list. These stories are being researched, walked, recorded and shaped right now."
       />
 
-      <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(80px,12vh,150px)]">
+      <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(80px,12vh,150px)]">
         {loading ? (
-          <div className="py-24 text-center font-mono text-[11px] tracking-[0.3em] text-bone/40">LOADING THE SLATE…</div>
+          <div className="py-24 text-center font-mono text-[11px] tracking-[0.3em] text-mute">LOADING THE SLATE…</div>
         ) : (
           <div data-testid="upcoming-list">
             <SlateFocus projects={projects} />

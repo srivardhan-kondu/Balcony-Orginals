@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { api, UPCOMING_STATUSES } from "@/lib/api";
-import { WebGLHero } from "@/components/WebGLHero";
-import { HeroMark } from "@/components/HeroMark";
-import { Reveal, MaskLines, EASE } from "@/components/Motion";
+import { SIZES } from "@/lib/images";
+import { MotionStill } from "@/components/Still";
+import { ProjectionHero } from "@/components/ProjectionHero";
+import { openMenu } from "@/components/Header";
+import { useIsDesktop } from "@/hooks/use-media-query";
+import { Reveal } from "@/components/Motion";
 import { FilmRing } from "@/components/FilmRing";
 import { CineCamera } from "@/components/CineCamera";
 import { FilmRibbon } from "@/components/FilmRibbon";
@@ -40,6 +43,15 @@ const CHAPTERS = [
   },
 ];
 
+/* One primary treatment for the whole page. Previously the hero filled its
+   primary with `bone` and the gems CTA filled with `gold` — which, while gold
+   resolved to white, rendered as two near-identical fills and gave the hero
+   button a hover state that changed nothing. Accent means action, everywhere. */
+const BTN_PRIMARY =
+  "inline-flex items-center gap-3 rounded-sm bg-gold px-7 py-4 text-xs font-medium uppercase tracking-[0.15em] text-ink transition-colors duration-300 hover:bg-gold-hi";
+const BTN_SECONDARY =
+  "inline-flex items-center gap-3 rounded-sm border border-bone/30 px-7 py-4 text-xs uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-gold";
+
 const Overline = ({ children, testid }) => (
   <div className="mb-6 flex items-center gap-3" data-testid={testid}>
     <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
@@ -51,7 +63,10 @@ const SectionLink = ({ to, children, testid }) => (
   <Link
     to={to}
     data-testid={testid}
-    className="group inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.2em] text-gold transition-colors hover:text-bone"
+    /* `py-2` only to carry the hit area past the 24px minimum — these sit on
+       their own line, so they are not the inline-in-a-sentence case the target
+       size rule exempts. */
+    className="group inline-flex min-h-[24px] items-center gap-2.5 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-gold transition-colors hover:text-bone"
   >
     {children}
     <ArrowRight size={13} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -61,12 +76,12 @@ const SectionLink = ({ to, children, testid }) => (
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [reelOpen, setReelOpen] = useState(false);
+  // The two decorative WebGL scenes are desktop-only. Mounting them behind a
+  // `hidden lg:block` still built the context and ran the loop on phones.
+  const isDesktop = useIsDesktop();
   const gemsRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: gemsRef, offset: ["start end", "end start"] });
   const gemsY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
-  const { scrollY: pageScrollY } = useScroll();
-  const heroCover = useTransform(pageScrollY, [0, 900], [0, 0.62]);
-  const heroScale = useTransform(pageScrollY, [0, 900], [1, 0.95]);
 
   const stripRef = useRef(null);
   const trackRef = useRef(null);
@@ -74,13 +89,23 @@ export default function Home() {
   const { scrollYProgress: stripProg } = useScroll({ target: stripRef, offset: ["start start", "end end"] });
   const stripX = useTransform(stripProg, [0, 1], [0, -overflow]);
 
+  /* A ResizeObserver on the track itself, rather than a window `resize`
+     listener: the track's width changes when the cards' images lay out and when
+     the font loads, neither of which resizes the window, and it was measuring
+     against `window.innerWidth` — which counts the scrollbar the track does not
+     get to use. */
   useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
     const measure = () => {
-      if (trackRef.current) setOverflow(Math.max(0, trackRef.current.scrollWidth - window.innerWidth + 80));
+      const visible = track.parentElement?.clientWidth ?? 0;
+      setOverflow(Math.max(0, track.scrollWidth - visible + 80));
     };
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    if (track.parentElement) ro.observe(track.parentElement);
+    return () => ro.disconnect();
   }, [projects]);
 
   useEffect(() => {
@@ -94,133 +119,19 @@ export default function Home() {
 
   return (
     <div data-testid="home-page">
-      {/* ————— HERO ————— */}
-      <section className="sticky top-0 flex h-[100svh] min-h-[100svh] flex-col justify-end overflow-hidden">
-        <WebGLHero className="absolute inset-0" />
-
-        {/* The splash already spends the full lockup, and the header carries it
-            permanently. So the hero holds the monogram only — a live metallic
-            "B" with spinning reels, read as an object rather than a third logo. */}
-        {/* On phones the mark sits in normal flow directly above the copy, so it
-            can never land on top of the headline whatever the screen height.
-            From md up it lifts out of flow and pins to the right of the type. */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.8, delay: 0.15, ease: EASE }}
-          className="pointer-events-none relative aspect-square w-[min(38vw,150px,20vh)] shrink-0 ml-[clamp(18px,4vw,58px)] md:absolute md:right-[3vw] md:top-1/2 md:ml-0 md:w-[min(42vw,600px)] md:-translate-y-1/2"
-        >
-          <HeroMark className="absolute inset-0" />
-          <div
-            aria-hidden="true"
-            className="absolute left-1/2 top-[78%] h-16 w-[70%] -translate-x-1/2 rounded-[100%] bg-bone/[0.06] blur-2xl"
-          />
-        </motion.div>
-
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/60" />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, transparent 55%, rgb(var(--bo-shadow) / var(--bo-shadow-strength)) 100%)",
-          }}
-        />
-
-        <span aria-hidden="true" className="absolute left-[26px] top-[96px] h-9 w-9 border-l border-t border-bone/25" />
-        <span aria-hidden="true" className="absolute right-[26px] top-[96px] h-9 w-9 border-r border-t border-bone/25" />
-        <div className="absolute right-[clamp(26px,4vw,58px)] top-[150px] hidden font-mono text-[9.5px] leading-[2] tracking-[0.22em] text-bone/35 md:block">
-          24 FPS · 35 MM
-          <br />
-          RAYALASEEMA · AP
-          <br />
-          LAT 14.75 N
-        </div>
-
-        <motion.div
-          style={{ scale: heroScale }}
-          className="relative mx-auto w-full max-w-[1560px] origin-bottom-left px-[clamp(18px,4vw,58px)] pb-[clamp(26px,4vh,46px)] pt-[clamp(20px,3vh,40px)] md:pt-[clamp(110px,14vh,180px)]"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="mb-[clamp(18px,3vh,30px)] flex items-center gap-3"
-          >
-            <span className="h-1.5 w-1.5 rotate-45 bg-bone" />
-            <span className="font-mono text-[10.5px] tracking-[0.24em] text-bone/60">
-              PRODUCTION HOUSE · EST. RAYALASEEMA
-            </span>
-          </motion.div>
-
-          <h1
-            data-testid="hero-headline"
-            className="font-display text-[clamp(28px,6.2vw,98px)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-bone"
-          >
-            <MaskLines
-              lines={["Stories rooted", "in culture.", "Told for the world."]}
-              delay={0.3}
-              lastClassName="text-sand"
-            />
-          </h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.75 }}
-            className="mt-[clamp(20px,3vh,32px)] max-w-[52ch] text-[15px] leading-[1.65] text-bone/70 md:text-[17px]"
-          >
-            Documentaries, films and stories rooted in the people, places and cultures that shape us.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.9 }}
-            className="mt-[clamp(28px,4vh,42px)] flex flex-wrap items-center gap-3.5"
-          >
-            <Link
-              to="/works"
-              data-testid="hero-explore-btn"
-              className="rounded-sm bg-bone px-7 py-4 text-xs font-medium uppercase tracking-[0.15em] text-ink transition-colors duration-300 hover:bg-gold"
-            >
-              Explore Stories
-            </Link>
-            <Link
-              to="/submit-story"
-              data-testid="hero-submit-story-btn"
-              className="rounded-sm border border-bone/30 px-7 py-4 text-xs uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-ink hover:bg-gold"
-            >
-              Submit Your Story
-            </Link>
-            <button
-              onClick={() => setReelOpen(true)}
-              data-testid="hero-watch-reel-btn"
-              className="group inline-flex items-center gap-3 px-1.5 py-4 text-[11.5px] uppercase tracking-[0.15em] text-bone/60 transition-colors hover:text-bone"
-            >
-              <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full border border-bone/35 transition-colors duration-300 group-hover:border-bone">
-                <Play size={10} className="ml-0.5 fill-current" />
-              </span>
-              Brand film
-            </button>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-ink"
-          style={{ opacity: heroCover }}
-        />
-
-        <div className="absolute bottom-0 left-1/2 hidden h-14 w-px -translate-x-1/2 overflow-hidden md:block">
-          <div className="bo-scroll-line h-full w-px bg-bone/70" />
-        </div>
-      </section>
+      {/* ————— HERO —————
+          A projector strikes behind the brand mark and throws its cone down the
+          page; the headline rises into the light. See ProjectionHero for the
+          sequence, and use-projection-fit for how the copy is kept inside the
+          beam. The stage pins itself dark — a projection room is a dark surface
+          by design — and the site Header stands down while it is on screen. */}
+      <ProjectionHero onOpenMenu={openMenu} onWatchReel={() => setReelOpen(true)} />
 
       <div className="relative z-[5] bg-ink">
       <Marquee />
 
       {/* ————— OUR ROOTS ————— */}
-      <section data-testid="roots-section" className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(80px,12vh,150px)]">
+      <section data-testid="roots-section" className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(80px,12vh,150px)]">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.35fr]">
           <div className="lg:sticky lg:top-32 lg:self-start">
             <Reveal>
@@ -233,7 +144,7 @@ export default function Home() {
                 root system; the stories are free to travel.
               </p>
               <div className="mt-10">
-                <div className="font-mono text-[10px] tracking-[0.24em] text-bone/40">
+                <div className="font-mono text-[10px] tracking-[0.24em] text-mute">
                   RAYALASEEMA → ANDHRA PRADESH → INDIA → WORLD
                 </div>
                 <motion.div
@@ -271,7 +182,7 @@ export default function Home() {
 
       {/* ————— FEATURED / THE ARCHIVE — the reel, big ————— */}
       <section data-testid="featured-section" className="relative overflow-hidden border-t border-line bg-ink2/40 pb-[clamp(50px,8vh,100px)] pt-[clamp(64px,9vh,110px)]">
-        <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+        <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)]">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Overline testid="featured-overline">Featured work · drag the reel</Overline>
@@ -297,11 +208,11 @@ export default function Home() {
         style={{ height: `calc(100svh + ${Math.max(overflow, 500)}px)` }}
       >
         <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden border-t border-line">
-          <div className="mx-auto w-full max-w-[1560px] px-[clamp(18px,4vw,58px)]">
-            <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="mx-auto w-full max-w-[1560px] px-[var(--bo-gutter)]">
+            <div className="flex flex-wrap items-end justify-between gap-6 short:gap-3">
               <div>
                 <Overline testid="docs-overline">The screening room · scroll to unspool</Overline>
-                <h2 className="font-display font-extrabold uppercase leading-[1.02] tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] text-bone">
+                <h2 className="font-display font-extrabold uppercase leading-[1.02] tracking-[-0.01em] text-[clamp(26px,3.6vw,50px)] text-bone short:text-[clamp(20px,4vh,30px)]">
                   One reel. Every story.
                 </h2>
               </div>
@@ -313,24 +224,31 @@ export default function Home() {
           <motion.div
             ref={trackRef}
             style={{ x: stripX }}
-            className="mt-12 flex w-max gap-6 pl-[clamp(18px,4vw,58px)] will-change-transform"
+            className="mt-12 flex w-max gap-6 pl-[var(--bo-gutter)] will-change-transform short:mt-5 short:gap-4"
           >
             {projects.map((p, i) => (
-              <div key={p.slug} className="w-[80vw] flex-none md:w-[44vw] lg:w-[34vw]">
-                <ProjectCard project={p} large index={i} />
+              /* The cards are sized by width, but their height follows from it
+                 at 16/10 — so on a short viewport the width has to be capped by
+                 the height available, or a 44vw card in landscape is taller
+                 than the panel that holds it and gets cropped. */
+              <div
+                key={p.slug}
+                className="w-[80vw] max-w-[calc(52svh*1.6)] flex-none md:w-[44vw] lg:w-[34vw]"
+              >
+                <ProjectCard project={p} large index={i} sizes={SIZES.strip} />
               </div>
             ))}
             <Link
               to="/works"
               data-testid="strip-archive-link"
-              className="group flex w-[60vw] flex-none items-center justify-center rounded-sm border border-dashed border-line md:w-[26vw]"
+              className="group flex w-[60vw] max-w-[calc(40svh*1.6)] flex-none items-center justify-center rounded-sm border border-dashed border-line md:w-[26vw]"
             >
-              <span className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-bone/60 transition-colors group-hover:text-bone">
-                Full archive <ArrowRight size={14} />
+              <span className="flex items-center gap-3 px-6 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-bone/70 transition-colors group-hover:text-bone">
+                Full archive <ArrowRight size={14} className="flex-none" />
               </span>
             </Link>
           </motion.div>
-          <div className="mx-[clamp(18px,4vw,58px)] mt-12 h-px bg-line">
+          <div className="mx-[var(--bo-gutter)] mt-12 h-px bg-line short:mt-5">
             <motion.div style={{ scaleX: stripProg }} className="h-px origin-left bg-bone/70" />
           </div>
         </div>
@@ -338,8 +256,10 @@ export default function Home() {
 
       {/* ————— FEATURE FILMS ————— */}
       <section data-testid="films-section" className="relative overflow-hidden border-t border-line py-[clamp(80px,12vh,150px)]">
-        <CineCamera className="pointer-events-none absolute right-[3%] top-[2%] z-0 hidden h-[420px] w-[420px] lg:block" />
-        <div className="relative z-[2] mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+        {isDesktop && (
+          <CineCamera className="pointer-events-none absolute right-[3%] top-[2%] z-0 h-[420px] w-[420px]" />
+        )}
+        <div className="relative z-[2] mx-auto max-w-[1560px] px-[var(--bo-gutter)]">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>
               <Overline testid="films-overline">Feature films</Overline>
@@ -360,7 +280,7 @@ export default function Home() {
             <div>
               {films.map((p) => (
                 <Reveal key={p.slug} delay={0.15}>
-                  <ProjectCard project={p} large />
+                  <ProjectCard project={p} large sizes={SIZES.half} />
                 </Reveal>
               ))}
             </div>
@@ -372,8 +292,10 @@ export default function Home() {
 
       {/* ————— UPCOMING ————— */}
       <section data-testid="upcoming-section" className="relative overflow-hidden border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">
-        <FilmReel className="pointer-events-none absolute -right-[7%] top-1/2 z-0 hidden h-[620px] w-[620px] -translate-y-1/2 opacity-60 lg:block" />
-        <div className="relative z-[2] mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)]">
+        {isDesktop && (
+          <FilmReel className="pointer-events-none absolute -right-[7%] top-1/2 z-0 h-[620px] w-[620px] -translate-y-1/2 opacity-60" />
+        )}
+        <div className="relative z-[2] mx-auto max-w-[1560px] px-[var(--bo-gutter)]">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Overline testid="upcoming-overline">Upcoming / In development</Overline>
@@ -391,16 +313,17 @@ export default function Home() {
 
       {/* ————— STORIES ARE GEMS ————— */}
       <section ref={gemsRef} data-testid="gems-section" className="relative overflow-hidden border-t border-line">
-        <motion.img
+        <MotionStill
           src="/assets/projects/gems.jpg"
-          alt=""
+          sizes={SIZES.full}
           aria-hidden="true"
+          loading="lazy"
           style={{ y: gemsY }}
           className="absolute inset-0 h-[120%] w-full object-cover opacity-40"
         />
         <ProjectorBeam className="absolute inset-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink via-ink/60 to-ink" />
-        <div className="relative mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,200px)]">
+        <div className="relative mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(110px,16vh,200px)]">
           <Reveal className="max-w-[780px]">
             <Overline testid="gems-overline">Stories are gems</Overline>
             <h2 className="font-display font-extrabold uppercase tracking-[-0.02em] text-[clamp(28px,4.8vw,70px)] leading-[1.0] text-bone">
@@ -412,11 +335,7 @@ export default function Home() {
               tell us about it.
             </p>
             <div className="mt-10">
-              <Link
-                to="/submit-story"
-                data-testid="gems-cta-btn"
-                className="inline-flex items-center gap-3 rounded-sm bg-gold px-8 py-4 text-xs font-medium uppercase tracking-[0.15em] text-ink transition-colors duration-300 hover:bg-bone"
-              >
+              <Link to="/submit-story" data-testid="gems-cta-btn" className={BTN_PRIMARY}>
                 Submit Your Story
                 <ArrowRight size={14} />
               </Link>
@@ -427,13 +346,13 @@ export default function Home() {
 
       {/* ————— WHY WE TELL STORIES ————— */}
       <section data-testid="why-section" className="border-t border-line">
-        <div className="mx-auto grid max-w-[1560px] gap-14 px-[clamp(18px,4vw,58px)] py-[clamp(80px,12vh,150px)] lg:grid-cols-[1fr_1.2fr]">
+        <div className="mx-auto grid max-w-[1560px] gap-14 px-[var(--bo-gutter)] py-[clamp(80px,12vh,150px)] lg:grid-cols-[1fr_1.2fr]">
           <Reveal>
             <Overline testid="why-overline">Why we tell stories</Overline>
             <div className="font-telugu text-[clamp(26px,3vw,40px)] leading-[1.5] text-gold/90">
               ప్రతి కథ ఒక రత్నం
             </div>
-            <div className="mt-3 font-mono text-[10px] tracking-[0.24em] text-bone/40">
+            <div className="mt-3 font-mono text-[10px] tracking-[0.24em] text-mute">
               EVERY STORY IS A GEM
             </div>
           </Reveal>
@@ -441,7 +360,7 @@ export default function Home() {
             <p className="font-serif text-[clamp(20px,2.2vw,30px)] leading-[1.5] text-bone">
               <ScrollFill text="We believe a story doesn't need permission to matter — it needs a patient camera, an honest edit, and someone willing to carry it. Balcony Originals exists to be that someone: to preserve stories, produce stories, and give strong stories a chance to travel." />
             </p>
-            <div className="mt-8 font-mono text-[10.5px] tracking-[0.22em] text-bone/40">
+            <div className="mt-8 font-mono text-[10.5px] tracking-[0.22em] text-mute">
               — BALCONY ORIGINALS · PRODUCTION PHILOSOPHY
             </div>
           </Reveal>
@@ -450,24 +369,16 @@ export default function Home() {
 
       {/* ————— FINAL CTA ————— */}
       <section data-testid="final-cta-section" className="relative overflow-hidden border-t border-line bg-ink2/40">
-        <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(110px,16vh,190px)] text-center">
+        <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(110px,16vh,190px)] text-center">
           <h2 className="mx-auto max-w-[24ch] font-display font-extrabold uppercase leading-[1.1] tracking-[-0.02em] text-[clamp(26px,4.4vw,62px)] text-bone">
             <ScrollFill text="Every place has a story. Every person carries one. We're here to tell it." />
           </h2>
           <Reveal delay={0.4}>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-3.5">
-              <Link
-                to="/works"
-                data-testid="final-explore-btn"
-                className="rounded-sm bg-bone px-7 py-4 text-xs font-medium uppercase tracking-[0.15em] text-ink transition-colors duration-300 hover:bg-gold"
-              >
+              <Link to="/works" data-testid="final-explore-btn" className={BTN_PRIMARY}>
                 Explore Stories
               </Link>
-              <Link
-                to="/submit-story"
-                data-testid="final-submit-btn"
-                className="rounded-sm border border-bone/30 px-7 py-4 text-xs uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-gold"
-              >
+              <Link to="/submit-story" data-testid="final-submit-btn" className={BTN_SECONDARY}>
                 Submit Your Story
               </Link>
             </div>

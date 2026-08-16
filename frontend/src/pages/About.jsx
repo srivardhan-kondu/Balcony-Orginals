@@ -4,6 +4,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Motion";
+import { MotionStill } from "@/components/Still";
+import { SIZES } from "@/lib/images";
 import { Marquee } from "@/components/Marquee";
 
 const VERTICALS = [
@@ -44,19 +46,21 @@ export default function About() {
       />
 
       <section ref={imgRef} className="relative h-[56vh] overflow-hidden border-y border-line md:h-[70vh]">
-        <motion.img
+        <MotionStill
           src="/assets/projects/about.jpg"
           alt="Balcony Originals crew filming a festival at golden hour"
+          sizes={SIZES.full}
+          decoding="async"
           style={{ y: imgY }}
           className="absolute inset-0 h-[120%] w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/40" />
-        <div className="absolute bottom-6 left-[clamp(18px,4vw,58px)] font-mono text-[10px] tracking-[0.22em] text-bone/60">
+        <div className="absolute bottom-6 left-[var(--bo-gutter)] font-mono text-[10px] tracking-[0.22em] text-bone/60">
           ON LOCATION · RAYALASEEMA
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(80px,12vh,150px)]">
+      <section className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(80px,12vh,150px)]">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.4fr]">
           <Reveal>
             <div className="flex items-center gap-3">
@@ -110,7 +114,7 @@ export default function About() {
 
       <Marquee />
 
-      <section className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] py-[clamp(80px,12vh,150px)]">
+      <section className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(80px,12vh,150px)]">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
             <h2 className="font-serif text-[clamp(24px,3vw,42px)] leading-[1.1] text-bone">

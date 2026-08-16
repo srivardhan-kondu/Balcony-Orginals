@@ -7,6 +7,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      /* Height breakpoints. Every measurement in this design was keyed to width,
+         so a phone turned on its side — a 390px-tall viewport asked to hold a
+         full-screen hero — had nowhere to put the overflow but under the crop.
+         These merge with Tailwind's own width breakpoints rather than replacing
+         them: `short:` and `shorter:` sit alongside `md:` and `lg:`. */
+      screens: {
+        short: { raw: "(max-height: 700px)" },
+        shorter: { raw: "(max-height: 560px)" },
+        /* Below Tailwind's `sm`, for the narrowest phones — the projection
+           hero's nav and telemetry each shed a segment here. A named screen
+           rather than an arbitrary `min-[420px]:` variant: those do not compile
+           in this craco/postcss setup, silently, and the class just vanishes. */
+        xs: "420px",
+      },
       fontFamily: {
         display: ['Archivo', 'system-ui', 'sans-serif'],
         serif: ['Marcellus', 'serif'],
@@ -23,6 +37,7 @@ module.exports = {
         bone: 'rgb(var(--bo-bone) / <alpha-value>)',
         sand: 'rgb(var(--bo-sand) / <alpha-value>)',
         gold: 'rgb(var(--bo-gold) / <alpha-value>)',
+        'gold-hi': 'rgb(var(--bo-gold-hi) / <alpha-value>)',
         terra: 'rgb(var(--bo-terra) / <alpha-value>)',
         mute: 'rgb(var(--bo-mute) / <alpha-value>)',
         dim: 'rgb(var(--bo-dim) / <alpha-value>)',

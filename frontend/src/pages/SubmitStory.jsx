@@ -8,7 +8,7 @@ const CATEGORIES = ["Culture", "Devotional", "Heritage", "People", "Feature Film
 
 const inputCls =
   "w-full border-b border-line bg-transparent py-3 text-[15px] text-bone placeholder:text-dim outline-none transition-colors duration-300 focus:border-gold";
-const labelCls = "mb-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/50";
+const labelCls = "mb-1 block font-mono text-[10px] uppercase tracking-[0.22em] text-mute";
 
 const Field = ({ label, required, children, htmlFor }) => (
   <div>
@@ -80,7 +80,7 @@ export default function SubmitStory() {
         sub="Have a story, idea or lived experience that deserves a bigger canvas? If you have the story but need the backbone to bring it to life, tell us in a few lines."
       />
 
-      <div className="mx-auto max-w-[1560px] px-[clamp(18px,4vw,58px)] pb-[clamp(80px,12vh,150px)]">
+      <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(80px,12vh,150px)]">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <div className="lg:sticky lg:top-32">

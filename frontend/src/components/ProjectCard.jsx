@@ -1,32 +1,39 @@
-import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
+import { Still } from "@/components/Still";
+import { SIZES } from "@/lib/images";
 
 export const StatusChip = ({ status }) => (
   <span
     data-testid={`status-chip-${status}`}
-    className="inline-flex items-center gap-2 rounded-sm border border-gold/40 bg-ink/60 px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-[0.2em] text-gold backdrop-blur-sm"
+    className="inline-flex items-center gap-2 rounded-sm border border-gold/40 bg-ink/70 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-gold backdrop-blur-sm"
   >
     <span className="h-1 w-1 rotate-45 bg-gold" />
     {STATUS_LABELS[status] || status}
   </span>
 );
 
-export const ProjectCard = ({ project, large = false, index }) => {
-  const ref = useRef(null);
+export const ProjectCard = ({ project, large = false, index, sizes = SIZES.grid3 }) => {
+  /* The tilt used to be written straight to `el.style.transform`, on the same
+     element framer-motion animates — so the two fought over one property and
+     `onMouseLeave` cleared whatever motion had last written. Handing the tilt
+     to motion values instead means there is one writer, and the entry animation
+     keeps the rotation axis to itself by no longer using rotateX. */
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springX = useSpring(rotateX, { stiffness: 260, damping: 26 });
+  const springY = useSpring(rotateY, { stiffness: 260, damping: 26 });
 
   const onMove = (e) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    el.style.transform = `perspective(1000px) rotateY(${px * 4}deg) rotateX(${-py * 4}deg)`;
+    const r = e.currentTarget.getBoundingClientRect();
+    rotateY.set(((e.clientX - r.left) / r.width - 0.5) * 4);
+    rotateX.set(-((e.clientY - r.top) / r.height - 0.5) * 4);
   };
   const onLeave = () => {
-    if (ref.current) ref.current.style.transform = "";
+    rotateX.set(0);
+    rotateY.set(0);
   };
 
   return (
@@ -37,20 +44,26 @@ export const ProjectCard = ({ project, large = false, index }) => {
       aria-label={`${project.title} — ${STATUS_LABELS[project.status] || project.status}`}
     >
       <motion.div
-        ref={ref}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
-        initial={{ clipPath: "inset(16% 9% 16% 9%)", opacity: 0, rotateX: 9, y: 34 }}
-        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1, rotateX: 0, y: 0 }}
+        initial={{ clipPath: "inset(16% 9% 16% 9%)", opacity: 0, y: 34 }}
+        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
         className="relative overflow-hidden rounded-sm border border-line bg-ink2 will-change-transform"
-        style={{ aspectRatio: large ? "16/10" : "16/11", transformPerspective: 1000 }}
+        style={{
+          aspectRatio: large ? "16/10" : "16/11",
+          transformPerspective: 1000,
+          rotateX: springX,
+          rotateY: springY,
+        }}
       >
-        <img
+        <Still
           src={project.hero}
           alt={project.title}
+          sizes={sizes}
           loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-90 transition-all duration-700 ease-out group-hover:scale-[1.05] group-hover:opacity-100"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/25 to-ink/10" />
@@ -61,7 +74,7 @@ export const ProjectCard = ({ project, large = false, index }) => {
 
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
           {typeof index === "number" ? (
-            <span className="font-mono text-[10px] tracking-[0.24em] text-bone/50">
+            <span className="font-mono text-[10px] tracking-[0.24em] text-bone/70">
               {String(index + 1).padStart(2, "0")}
             </span>
           ) : (
@@ -78,7 +91,7 @@ export const ProjectCard = ({ project, large = false, index }) => {
             <h3 className={`mt-1 font-serif leading-[1.12] text-bone ${large ? "text-[clamp(24px,2.6vw,40px)]" : "text-[clamp(20px,2vw,30px)]"}`}>
               {project.title}
             </h3>
-            <div className="mt-2 font-mono text-[9.5px] uppercase tracking-[0.2em] text-bone/55">
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-bone/70">
               {[project.type === "feature" ? "Feature Film" : "Documentary", project.location, project.year]
                 .filter(Boolean)
                 .join(" · ")}
