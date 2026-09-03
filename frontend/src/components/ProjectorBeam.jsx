@@ -1,31 +1,22 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { useThemeMode } from "@/lib/theme";
 
-// A projector beam is light thrown into a dark room, so additive white is right
-// in the dark theme and invisible in the light one. On paper the same cone is
-// drawn as the shadow the beam would cast instead.
+// A projector beam is light thrown into a dark room, so the cone and its dust
+// are additive white against the black of the page.
 const PALETTE = {
-  dark: {
-    blending: THREE.AdditiveBlending,
-    cone: { color: 0xffffff, opacity: 0.075 },
-    dust: { color: 0xffffff, opacity: 0.55 },
-  },
-  light: {
-    blending: THREE.NormalBlending,
-    cone: { color: 0x2e2a25, opacity: 0.05 },
-    dust: { color: 0x3a352e, opacity: 0.3 },
-  },
+  blending: THREE.AdditiveBlending,
+  cone: { color: 0xffffff, opacity: 0.075 },
+  dust: { color: 0xffffff, opacity: 0.55 },
 };
 
 export const ProjectorBeam = ({ className = "" }) => {
   const mountRef = useRef(null);
-  const mode = useThemeMode();
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-    const palette = PALETTE[mode];
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -48,10 +39,10 @@ export const ProjectorBeam = ({ className = "" }) => {
 
     const coneGeo = new THREE.CylinderGeometry(0.05, 1.7, 7.5, 32, 1, true);
     const coneMat = new THREE.MeshBasicMaterial({
-      color: palette.cone.color,
+      color: PALETTE.cone.color,
       transparent: true,
-      opacity: palette.cone.opacity,
-      blending: palette.blending,
+      opacity: PALETTE.cone.opacity,
+      blending: PALETTE.blending,
       side: THREE.DoubleSide,
       depthWrite: false,
     });
@@ -77,11 +68,11 @@ export const ProjectorBeam = ({ className = "" }) => {
     const dust = new THREE.Points(
       dustGeo,
       new THREE.PointsMaterial({
-        color: palette.dust.color,
+        color: PALETTE.dust.color,
         size: 0.03,
         transparent: true,
-        opacity: palette.dust.opacity,
-        blending: palette.blending,
+        opacity: PALETTE.dust.opacity,
+        blending: PALETTE.blending,
         depthWrite: false,
       })
     );
@@ -132,7 +123,7 @@ export const ProjectorBeam = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, [mode]);
+  }, []);
 
   return <div ref={mountRef} data-testid="projector-beam-3d" aria-hidden="true" className={className} />;
 };

@@ -1,10 +1,10 @@
 import axios from "axios";
 import { PROJECTS_FALLBACK } from "@/lib/fallback";
 
-// REACT_APP_* is inlined at build time, so this is baked into the bundle by Vercel.
-// Trailing slashes are stripped, and an unset var falls back to a same-origin "/api"
-// rather than producing the string "undefined/api".
-const BASE = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/+$/, "");
+// NEXT_PUBLIC_* is inlined at build time, so this is baked into the bundle by
+// Vercel. Trailing slashes are stripped, and an unset var falls back to a
+// same-origin "/api" rather than producing the string "undefined/api".
+const BASE = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
 
 const API = `${BASE}/api`;
 
@@ -23,12 +23,16 @@ const fallbackProject = (slug) => {
   return p;
 };
 
-/* A 200 is not proof of an API. `vercel.json` rewrites every unmatched path to
-   index.html, so with REACT_APP_BACKEND_URL unset at build time the request for
-   /api/projects resolves — with the HTML page as its body. That sailed past the
-   `.catch` and only failed later, on `projects.filter(...)`, taking the whole
-   page down with it. Shape is checked here so a wrong answer falls back like a
-   missing one. */
+/* A 200 is not proof of an API. With the backend URL unset, a request for
+   /api/projects can still resolve against the site's own host — and answer with
+   an HTML page as its body. That sailed past the `.catch` and only failed later,
+   on `projects.filter(...)`, taking the whole page down with it. Shape is
+   checked here so a wrong answer falls back like a missing one.
+
+   This client is now the *second* read of the archive, not the first: every
+   page is server-rendered with the build-time copy (see lib/projects.js) and
+   these calls refresh it on mount. A failure here therefore leaves the story
+   already on screen rather than an empty list. */
 export const api = {
   projects: (params) =>
     axios

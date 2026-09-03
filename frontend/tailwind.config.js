@@ -1,10 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+    /* The site is dark and has no theme switch, so nothing ever puts a `dark`
+       class on the document and no `dark:` variant should exist. This stays on
+       "class" rather than being dropped: the default is "media", which would
+       quietly hand any stray `dark:` utility over to the reader's OS setting. */
     darkMode: ["class"],
-    content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./public/index.html"
-  ],
+    content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       /* Height breakpoints. Every measurement in this design was keyed to width,
@@ -17,8 +18,10 @@ module.exports = {
         shorter: { raw: "(max-height: 560px)" },
         /* Below Tailwind's `sm`, for the narrowest phones — the projection
            hero's nav and telemetry each shed a segment here. A named screen
-           rather than an arbitrary `min-[420px]:` variant: those do not compile
-           in this craco/postcss setup, silently, and the class just vanishes. */
+           rather than an arbitrary `min-[420px]:` variant: those did not compile
+           in the old craco/postcss setup, silently, and the class just vanished.
+           Kept named because the classes reading it are spread across the
+           projection hero and there is no reason to re-risk it. */
         xs: "420px",
       },
       fontFamily: {

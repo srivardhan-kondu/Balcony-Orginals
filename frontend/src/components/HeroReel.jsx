@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+"use client";
+
 import { MotionStill, Still } from "@/components/Still";
 import { SIZES } from "@/lib/images";
+import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 
 /* ---------------------------------------------------------------------------
    The hero backdrop.
@@ -15,18 +17,10 @@ import { SIZES } from "@/lib/images";
    to which one is playing.
    --------------------------------------------------------------------------- */
 
-export const useReducedMotion = () => {
-  const [reduced, setReduced] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-};
+/* Kept as a named export because it was one; the subscription itself now lives
+   in use-media-query, which states what the server should answer rather than
+   guessing at it behind a `typeof window` check. */
+export const useReducedMotion = usePrefersReducedMotion;
 
 export const HeroReel = ({ frames = [], index = 0, video, poster, className = "" }) => {
   const reduced = useReducedMotion();

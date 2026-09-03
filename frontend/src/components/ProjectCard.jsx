@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
@@ -38,7 +40,7 @@ export const ProjectCard = ({ project, large = false, index, sizes = SIZES.grid3
 
   return (
     <Link
-      to={`/projects/${project.slug}`}
+      href={`/projects/${project.slug}`}
       data-testid={`project-card-${project.slug}`}
       className="group block"
       aria-label={`${project.title} — ${STATUS_LABELS[project.status] || project.status}`}

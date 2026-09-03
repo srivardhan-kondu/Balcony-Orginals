@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useInView } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { StatusChip } from "@/components/ProjectCard";
@@ -58,7 +60,7 @@ const Panel = ({ p, i, active, onFocus }) => {
           >
             <StatusChip status={p.status} />
             <Link
-              to={`/projects/${p.slug}`}
+              href={`/projects/${p.slug}`}
               data-testid={`slate-view-${p.slug}`}
               className="group inline-flex items-center gap-2.5 rounded-sm border border-bone/30 px-5 py-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone transition-colors duration-300 hover:bg-bone hover:text-ink"
             >
@@ -74,7 +76,7 @@ const Panel = ({ p, i, active, onFocus }) => {
           }`}
           style={{ aspectRatio: "16/9" }}
         >
-          <Link to={`/projects/${p.slug}`} tabIndex={-1} aria-label={`Open ${p.title}`}>
+          <Link href={`/projects/${p.slug}`} tabIndex={-1} aria-label={`Open ${p.title}`}>
             <Still
               src={p.hero}
               alt={p.title}

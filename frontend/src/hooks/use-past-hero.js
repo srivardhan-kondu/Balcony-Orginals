@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 
 /**
  * Whether the site's own chrome — the header bar, the footage counter — should
@@ -11,7 +13,7 @@ import { useLocation } from "react-router-dom";
  * two wordmarks and two footage counters stacked on one composition.
  */
 export const useSiteChromeVisible = () => {
-  const { pathname } = useLocation();
+  const pathname = usePathname();
   const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {

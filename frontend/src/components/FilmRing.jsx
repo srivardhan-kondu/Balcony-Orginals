@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
 import { Still } from "@/components/Still";
@@ -7,7 +9,7 @@ import { SIZES } from "@/lib/images";
 import { getAudioContext, getMaster, isSoundEnabled, setSoundEnabled, subscribeSound } from "@/lib/sound";
 
 export const FilmRing = ({ projects = [] }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const items = projects.length ? [...projects, ...projects] : [];
   const n = items.length;
   const ringRef = useRef(null);
@@ -187,7 +189,7 @@ export const FilmRing = ({ projects = [] }) => {
               ref={(el) => (panelRefs.current[i] = el)}
               data-testid={`film-ring-panel-${i}`}
               onClick={() => {
-                if (moved.current < 8) navigate(`/projects/${p.slug}`);
+                if (moved.current < 8) router.push(`/projects/${p.slug}`);
               }}
               className="group absolute inset-0 cursor-pointer"
               style={{

@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { LampMark } from "@/components/projection/LampMark";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { T, at, anim } from "@/lib/projection-timeline";
 
@@ -42,7 +43,7 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
           style={reveal}
         >
           {LEFT.map((l) => (
-            <Link key={l.label} to={l.to} data-testid={`hero-nav-${l.label.toLowerCase()}`} className={`${link} text-[#e6e6e6] hover:text-white`}>
+            <Link key={l.label} href={l.to} data-testid={`hero-nav-${l.label.toLowerCase()}`} className={`${link} text-[#e6e6e6] hover:text-white`}>
               {l.label}
             </Link>
           ))}
@@ -61,7 +62,7 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
         </button>
       )}
 
-      <Link to="/" aria-label="Balcony Originals — home" className="justify-self-center">
+      <Link href="/" aria-label="Balcony Originals — home" className="justify-self-center">
         <LampMark ref={markRef} />
       </Link>
 
@@ -72,19 +73,18 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
           style={reveal}
         >
           {RIGHT.map((l) => (
-            <Link key={l.label} to={l.to} data-testid={`hero-nav-${l.label.toLowerCase()}`} className={`${link} text-[#e6e6e6] hover:text-white`}>
+            <Link key={l.label} href={l.to} data-testid={`hero-nav-${l.label.toLowerCase()}`} className={`${link} text-[#e6e6e6] hover:text-white`}>
               {l.label}
             </Link>
           ))}
           <Link
-            to="/submit-story"
+            href="/submit-story"
             data-testid="hero-nav-submit"
             className={`${link} flex items-center gap-2.5 border border-[#2f2f2f] px-5 py-[13px] text-[#e6e6e6] hover:border-[#f2f2f2] hover:text-white`}
           >
             <span aria-hidden="true" className="h-[7px] w-[7px] rotate-45 bg-[#ec3013]" />
             <span className="whitespace-nowrap">SUBMIT YOUR STORY</span>
           </Link>
-          <ThemeToggle className="!min-h-[44px] !min-w-[44px] border-[#2f2f2f] text-[#b4b4b4] hover:border-[#f2f2f2] hover:text-white" />
         </div>
       ) : (
         <div
@@ -95,7 +95,6 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
           <span className="hidden whitespace-nowrap font-mono text-[11px] tracking-[0.24em] text-[#8e8e8e] xs:inline">
             24 FPS
           </span>
-          <ThemeToggle className="border-[#2f2f2f] text-[#b4b4b4] hover:border-[#f2f2f2] hover:text-white" />
         </div>
       )}
     </nav>

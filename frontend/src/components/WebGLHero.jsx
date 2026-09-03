@@ -1,35 +1,24 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { useThemeMode } from "@/lib/theme";
 
-// Additive blending adds light, so on paper every one of these layers blows out
-// to white and vanishes. The light theme swaps to normal blending with dark
-// motes: the same drift, read as dust in a shaft of daylight rather than embers.
+// Additive blending against near-black: the motes read as embers drifting in a
+// dark room, and the shafts as light picking them out.
 const PALETTE = {
-  dark: {
-    fog: 0x050505,
-    blending: THREE.AdditiveBlending,
-    embers: { color: 0xe6e6e6, opacity: 0.8 },
-    dust: { color: 0x6e6e6e, opacity: 0.22 },
-    shaft: { color: 0xe6e6e6, opacity: 0.035, step: 0.012 },
-  },
-  light: {
-    fog: 0xfaf9f6,
-    blending: THREE.NormalBlending,
-    embers: { color: 0x2a2621, opacity: 0.42 },
-    dust: { color: 0x6b6761, opacity: 0.2 },
-    shaft: { color: 0x8a837a, opacity: 0.05, step: 0.014 },
-  },
+  fog: 0x050505,
+  blending: THREE.AdditiveBlending,
+  embers: { color: 0xe6e6e6, opacity: 0.8 },
+  dust: { color: 0x6e6e6e, opacity: 0.22 },
+  shaft: { color: 0xe6e6e6, opacity: 0.035, step: 0.012 },
 };
 
 export const WebGLHero = ({ className = "" }) => {
   const mountRef = useRef(null);
-  const mode = useThemeMode();
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-    const palette = PALETTE[mode];
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
@@ -38,7 +27,7 @@ export const WebGLHero = ({ className = "" }) => {
     }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(palette.fog, 0.045);
+    scene.fog = new THREE.FogExp2(PALETTE.fog, 0.045);
     const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
     camera.position.set(0, 0.4, 8.5);
 
@@ -61,11 +50,11 @@ export const WebGLHero = ({ className = "" }) => {
     const embers = new THREE.Points(
       geo,
       new THREE.PointsMaterial({
-        color: palette.embers.color,
+        color: PALETTE.embers.color,
         size: 0.045,
         transparent: true,
-        opacity: palette.embers.opacity,
-        blending: palette.blending,
+        opacity: PALETTE.embers.opacity,
+        blending: PALETTE.blending,
         depthWrite: false,
       })
     );
@@ -84,11 +73,11 @@ export const WebGLHero = ({ className = "" }) => {
     const dust = new THREE.Points(
       geo2,
       new THREE.PointsMaterial({
-        color: palette.dust.color,
+        color: PALETTE.dust.color,
         size: 0.11,
         transparent: true,
-        opacity: palette.dust.opacity,
-        blending: palette.blending,
+        opacity: PALETTE.dust.opacity,
+        blending: PALETTE.blending,
         depthWrite: false,
       })
     );
@@ -101,10 +90,10 @@ export const WebGLHero = ({ className = "" }) => {
       const m = new THREE.Mesh(
         shaftGeo,
         new THREE.MeshBasicMaterial({
-          color: palette.shaft.color,
+          color: PALETTE.shaft.color,
           transparent: true,
-          opacity: palette.shaft.opacity + i * palette.shaft.step,
-          blending: palette.blending,
+          opacity: PALETTE.shaft.opacity + i * PALETTE.shaft.step,
+          blending: PALETTE.blending,
           side: THREE.DoubleSide,
           depthWrite: false,
         })
@@ -181,7 +170,7 @@ export const WebGLHero = ({ className = "" }) => {
       renderer.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, [mode]);
+  }, []);
 
   return <div ref={mountRef} aria-hidden="true" data-testid="webgl-hero-canvas" className={className} />;
 };

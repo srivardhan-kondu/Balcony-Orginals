@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import { CopyrightYear } from "@/components/CopyrightYear";
 
 export const Footer = () => (
   <footer data-testid="site-footer" className="border-t border-line bg-ink">
@@ -10,7 +11,7 @@ export const Footer = () => (
             alt="Balcony Originals"
             width="503"
             height="347"
-            className="bo-logo h-12 w-auto opacity-95"
+            className="h-12 w-auto opacity-95"
           />
           <p className="mt-6 max-w-[36ch] font-serif text-xl leading-snug text-sand md:text-2xl">
             Stories rooted in culture. Told for the world.
@@ -31,7 +32,7 @@ export const Footer = () => (
               { to: "/submit-story", label: "Submit Your Story", id: "footer-link-submit" },
             ].map((l) => (
               <li key={l.id}>
-                <Link to={l.to} data-testid={l.id} className="inline-block py-1.5 text-sm text-bone/70 transition-colors hover:text-gold">
+                <Link href={l.to} data-testid={l.id} className="inline-block py-1.5 text-sm text-bone/70 transition-colors hover:text-gold">
                   {l.label}
                 </Link>
               </li>
@@ -46,7 +47,7 @@ export const Footer = () => (
               { to: "/contact", label: "Contact", id: "footer-link-contact" },
             ].map((l) => (
               <li key={l.id}>
-                <Link to={l.to} data-testid={l.id} className="inline-block py-1.5 text-sm text-bone/70 transition-colors hover:text-gold">
+                <Link href={l.to} data-testid={l.id} className="inline-block py-1.5 text-sm text-bone/70 transition-colors hover:text-gold">
                   {l.label}
                 </Link>
               </li>
@@ -59,7 +60,7 @@ export const Footer = () => (
       </div>
       <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-7">
         <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
-          © {new Date().getFullYear()} BALCONY ORIGINALS
+          © <CopyrightYear /> BALCONY ORIGINALS
         </span>
         <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
           EVERY STORY IS A GEM

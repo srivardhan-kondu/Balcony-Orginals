@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# Balcony Originals — frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Next.js](https://nextjs.org) (App Router) + Tailwind, statically generated.
 
-## Available Scripts
+Every route is written to disk as real HTML at build time, including one page
+per story in the archive. The live API is still the source of truth at runtime —
+the page bodies re-fetch on mount and replace the build-time copy — but the
+stories, the metadata and the structured data are in the response before a line
+of JavaScript runs.
 
-In the project directory, you can run:
+## Scripts
 
-### `npm start`
+| | |
+|---|---|
+| `yarn dev` | Dev server on http://localhost:3000 |
+| `yarn build` | Production build — prerenders every route |
+| `yarn start` | Serve a production build locally |
+| `yarn lint` | ESLint, via `eslint-config-next` |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Copy `.env.example` to `.env.local` before `yarn dev`. Both variables it
+documents are inlined at build time, so changing either needs a rebuild.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Layout
 
-### `npm test`
+```
+src/
+  app/                    routes, metadata, sitemap, robots
+    layout.jsx            the document — head, scripts, chrome, JSON-LD
+    providers.jsx         React Query, Lenis, MotionConfig
+    page.jsx              /
+    works/                /works
+    projects/[slug]/      one generated page per story
+    …
+  views/                  the page bodies (Client Components)
+  components/             shared UI; `ui/` is shadcn
+  hooks/
+  lib/
+    site.js               titles, canonicals, share cards — one source
+    seo.js                schema.org builders
+    projects.js           the archive, read on the server at build time
+    api.js                the archive, re-read in the browser
+    fallback.js           the archive as shipped, when the API is unreachable
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+`src/views/` rather than `src/pages/` on purpose: `src/pages/` is the Pages
+Router's own directory, and having both would make Next try to route the page
+bodies as well as the routes that render them.
 
-### `npm run build`
+## Notes
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Client Components.** Anything reaching for a hook, a browser API, an event
+  handler or framer-motion carries `"use client"`. `Footer`, `PageHero`,
+  `Grain` and `Marquee` are Server Components and ship no JavaScript.
+- **`useSearchParams` needs a Suspense boundary.** A prerender has no query
+  string to read, so Next renders the boundary's fallback into the static HTML
+  instead. Where the content matters — the archive grid, the header nav — the
+  fallback is the real thing rendered without the query, not a spinner.
+- **Images** are served through the hand-built ladder in `lib/images.js`, not
+  `next/image`; `scripts/derive_images.py` writes the derivatives. Next's
+  optimiser is off in `next.config.js` so the two do not overlap.
