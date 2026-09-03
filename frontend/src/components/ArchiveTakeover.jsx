@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { ArrowUpRight, Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
@@ -36,7 +38,7 @@ const Panel = ({ p, i, n, progress }) => {
           </h3>
           <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-bone/70">{p.logline}</p>
           <Link
-            to={`/projects/${p.slug}`}
+            href={`/projects/${p.slug}`}
             data-testid={`takeover-view-${p.slug}`}
             className="group mt-7 inline-flex items-center gap-2.5 rounded-sm border border-bone/35 px-6 py-3.5 font-mono text-[10.5px] uppercase tracking-[0.2em] text-bone transition-colors duration-300 hover:bg-bone hover:text-ink"
           >

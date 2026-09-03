@@ -1,5 +1,7 @@
+"use client";
+
 import { useCallback, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Play, RotateCcw } from "lucide-react";
 import { ProjectionBeam } from "@/components/projection/ProjectionBeam";
 import { ProjectionNav } from "@/components/projection/ProjectionNav";
@@ -17,9 +19,6 @@ import { playLamp } from "@/lib/sound";
    CSS timeline (see the `bp-*` keyframes in index.css) held at
    `animation-play-state: paused` until the splash lifts — everything here is
    sequencing and measurement, never per-frame work.
-
-   `bo-dark`: a projection room is a dark surface by design, like the splash and
-   the lightbox, so the theatre palette is pinned here whatever the page theme.
    --------------------------------------------------------------------------- */
 
 const HEADLINE = ["Stories rooted", "in culture.", "Told for the world."];
@@ -132,7 +131,7 @@ export const ProjectionHero = ({
     <section
       ref={stageRef}
       data-testid="projection-hero"
-      className="bp-stage bo-dark relative flex h-[100svh] min-h-[100svh] flex-col overflow-hidden"
+      className="bp-stage relative flex h-[100svh] min-h-[100svh] flex-col overflow-hidden"
       style={{ background: "#050505", color: "#f2f2f2" }}
     >
       <ProjectionBeam />
@@ -185,14 +184,14 @@ export const ProjectionHero = ({
           style={anim(`bp-fadeup 1s cubic-bezier(.2,.8,.2,1) ${at(T.cta)} both`)}
         >
           <Link
-            to="/works"
+            href="/works"
             data-testid="hero-explore-btn"
             className={`${cta} bg-[#f2f2f2] px-[clamp(22px,2.4vw,34px)] py-[clamp(15px,1.6vh,20px)] text-[#050505] hover:bg-white`}
           >
             EXPLORE STORIES
           </Link>
           <Link
-            to="/submit-story"
+            href="/submit-story"
             data-testid="hero-submit-story-btn"
             className={`${cta} border border-[#2f2f2f] px-[clamp(22px,2.4vw,34px)] py-[clamp(14px,1.6vh,19px)] hover:border-[#f2f2f2]`}
           >

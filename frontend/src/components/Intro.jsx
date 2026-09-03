@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 
 /* How long the loader holds the screen. The film itself runs 2.33s, so it is
@@ -50,20 +52,24 @@ export const Intro = () => {
      fades, and only then does the page underneath begin. On home that page is
      the projection hero, which starts from black — so the hand-off reads as
      one continuous entrance rather than two competing intros.
-     Once per session, as before. */
-  const [show, setShow] = useState(() => {
-    try {
-      return !sessionStorage.getItem("bo-intro-seen");
-    } catch {
-      return false;
-    }
-  });
+     Once per session, as before.
+
+     `false` to start, always — and not because the splash is unwanted, but
+     because whether it is owed can only be answered in a browser. The pages are
+     prerendered now, and `sessionStorage` does not exist during a prerender;
+     reading it in this initialiser meant the server rendered nothing and the
+     browser rendered a full-screen overlay, which is exactly the disagreement
+     hydration exists to catch. The decision moved into the effect below, where
+     the answer is knowable. It costs one frame, behind a screen that is black
+     in either case. */
+  const [show, setShow] = useState(false);
   const [fading, setFading] = useState(false);
   /* Under reduced motion the film is never played, so the poster frame is the
-     whole splash — it is the one case where a still is right. */
-  const [reduced] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+     whole splash — it is the one case where a still is right. Read once the
+     splash is up, for the same reason as above, and read directly rather than
+     through the shared hook: this is a one-shot question asked at the moment
+     the overlay appears, not a preference to stay subscribed to. */
+  const [reduced, setReduced] = useState(false);
   /* Everywhere else the video stays invisible until it is actually running.
      A <video> paints its first decoded frame as soon as it has one, so without
      this the mark appears, freezes while the rest buffers, and only then
@@ -72,12 +78,28 @@ export const Intro = () => {
   const vidRef = useRef(null);
   const ended = useRef(false);
 
+  /* Has the splash already run this session? Answered on mount, and the two
+     outcomes are the whole of it: release the page immediately, or raise the
+     overlay and let the effect below take over. */
   useEffect(() => {
-    if (!show) {
-      // Second visit onward: nothing is covering the page, so release at once.
+    let seen = true;
+    try {
+      seen = !!sessionStorage.getItem("bo-intro-seen");
+    } catch {
+      // No storage (private mode, embedded browser) — treat it as seen rather
+      // than replaying the splash on every route change.
+    }
+    if (seen) {
+      // Nothing is covering the page, so release at once.
       announce();
       return;
     }
+    setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    setShow(true);
+  }, []);
+
+  useEffect(() => {
+    if (!show) return;
 
     const html = document.documentElement;
     const prevOverflow = html.style.overflow;
@@ -100,7 +122,7 @@ export const Intro = () => {
       html.style.overflow = prevOverflow;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [show]);
 
   const end = () => {
     if (ended.current) return;
@@ -118,14 +140,12 @@ export const Intro = () => {
 
   if (!show) return null;
 
-  // bo-dark: the splash is a black-letterboxed brand film, so it plays the same
-  // in both themes rather than flipping with the page.
   return (
     <div
       data-testid="brand-intro"
       role="dialog"
       aria-label="Balcony Originals"
-      className="bo-dark fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-black"
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-black"
       style={{ opacity: fading ? 0 : 1, transition: `opacity ${FADE_MS}ms ease` }}
     >
       {/* The video is letterboxed black on black, so overflowing it on narrow

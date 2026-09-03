@@ -4,7 +4,7 @@ Three pieces:
 
 | Piece | Host | Source |
 |---|---|---|
-| Frontend (React/CRA) | **Vercel** | `frontend/` |
+| Frontend (Next.js) | **Vercel** | `frontend/` |
 | API (FastAPI) | **Render** | `backend/` |
 | Database (MongoDB) | **Atlas** (or any Mongo host) | — |
 
@@ -50,18 +50,32 @@ Note the URL Render gives you, e.g. `https://balcony-originals-api.onrender.com`
 Import the repo, then **set Root Directory to `frontend`**. This is the one setting
 people miss; without it the build fails because Vercel looks at the repo root.
 
-Everything else comes from [`frontend/vercel.json`](frontend/vercel.json) — build
-command, output directory, SPA rewrites (so `/works` and `/projects/:slug` survive
-a hard refresh instead of 404ing), and cache headers.
+Vercel detects Next.js and needs no further build configuration;
+[`frontend/vercel.json`](frontend/vercel.json) only pins the framework and the
+install command. There are no SPA rewrites any more — every route is a real
+generated page, so `/works` and `/projects/:slug` survive a hard refresh because
+the files exist, not because a catch-all rewrite serves `index.html`.
 
-Add one environment variable:
+Add two environment variables:
 
 | Variable | Value |
 |---|---|
-| `REACT_APP_BACKEND_URL` | Your Render URL, **no trailing slash, no `/api`** — e.g. `https://balcony-originals-api.onrender.com` |
+| `NEXT_PUBLIC_BACKEND_URL` | Your Render URL, **no trailing slash, no `/api`** — e.g. `https://balcony-originals-api.onrender.com` |
+| `NEXT_PUBLIC_SITE_URL` | The site's own origin, **no trailing slash** — e.g. `https://balconyoriginals.com` |
 
-> This is inlined into the JS bundle at build time, not read at runtime.
-> **Changing it requires a redeploy** — it will not take effect on its own.
+> Both are inlined at build time, not read at runtime. **Changing either
+> requires a redeploy** — they will not take effect on their own.
+
+`NEXT_PUBLIC_SITE_URL` is the one that is easy to get wrong and expensive to
+leave wrong: every canonical tag, `og:url`, sitemap entry and piece of
+structured data on the site is absolute and is built from it. Point it at the
+domain you actually serve, not at the `*.vercel.app` preview URL.
+
+> **The backend is read at build time too.** `lib/projects.js` asks the API for
+> the archive while Vercel is building, so the stories are baked into the HTML.
+> It gives up after six seconds and falls back to the static copy in
+> `lib/fallback.js` — a sleeping free-tier Render service will not fail the
+> build, it will just mean that build ships the archive as committed.
 
 ---
 
@@ -120,20 +134,25 @@ uvicorn server:app --reload --port 8000
 # Frontend — http://localhost:3000
 cd frontend
 yarn install
-cp .env.example .env          # REACT_APP_BACKEND_URL=http://localhost:8000
-yarn start
+cp .env.example .env.local    # NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+yarn dev                      # or: yarn build && yarn start
 ```
 
 ---
 
 ## Before you go public
 
-- **Third-party scripts.** [`frontend/public/index.html`](frontend/public/index.html)
+- **Third-party scripts.** [`frontend/src/app/layout.jsx`](frontend/src/app/layout.jsx)
   loads `assets.emergent.sh/scripts/emergent-main.js` and initialises **PostHog
   analytics with session recording**, pointing at the Emergent platform's host
   (`ap.emergent.sh`). These are builder-platform artifacts, not your analytics.
   On your own domain they mean visitor sessions are recorded to a third party —
-  worth deleting both `<script>` blocks unless you specifically want them.
+  worth deleting both `<Script>` blocks unless you specifically want them.
+- **Tell Google the site exists.** `robots.txt` and `sitemap.xml` are generated
+  ([`app/robots.js`](frontend/src/app/robots.js),
+  [`app/sitemap.js`](frontend/src/app/sitemap.js)) and the sitemap is built from
+  the archive, so it stays current on its own. Submit it once in Google Search
+  Console after the domain is live; nothing else is needed per deploy.
 - **Imagery is AI-generated placeholders.** All 15 files in
   `frontend/public/assets/projects/` came from
   [`scripts/generate_images.py`](scripts/generate_images.py). Swap in real
