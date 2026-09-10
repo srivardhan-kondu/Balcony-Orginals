@@ -29,6 +29,7 @@ export const Footer = () => (
               { to: "/works", label: "Stories & Works", id: "footer-link-works" },
               { to: "/works?type=feature", label: "Feature Films", id: "footer-link-films" },
               { to: "/upcoming", label: "Upcoming", id: "footer-link-upcoming" },
+              { to: "/gallery", label: "Gallery", id: "footer-link-gallery" },
               { to: "/submit-story", label: "Submit Your Story", id: "footer-link-submit" },
             ].map((l) => (
               <li key={l.id}>

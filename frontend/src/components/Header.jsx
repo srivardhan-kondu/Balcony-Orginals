@@ -12,6 +12,7 @@ const LINKS = [
   { to: "/works", label: "Stories", testid: "nav-link-works" },
   { to: "/works?type=feature", label: "Films", testid: "nav-link-films" },
   { to: "/upcoming", label: "Upcoming", testid: "nav-link-upcoming" },
+  { to: "/gallery", label: "Gallery", testid: "nav-link-gallery" },
   { to: "/about", label: "About", testid: "nav-link-about" },
   { to: "/contact", label: "Contact", testid: "nav-link-contact" },
 ];
@@ -218,13 +219,24 @@ export const Header = () => {
             <ActiveDesktopNav />
           </Suspense>
 
-          <div className="flex items-center gap-2.5 lg:hidden">
+          {/* The recognition rides at the end of the bar, opposite our own
+              marks rather than beside them — an endorsement, not a co-brand.
+              There is no room for a "recognised by" label at this height, so
+              the alt text carries what the eyebrow would have said. */}
+          <div className="flex flex-none items-center gap-3.5">
+            <img
+              src="/assets/ap-tourism.png"
+              alt="Recognised by Andhra Pradesh Tourism"
+              width="362"
+              height="216"
+              className="block h-[30px] w-auto opacity-85 lg:h-[38px]"
+            />
             <button
               data-testid="mobile-menu-btn"
               onClick={() => setOpen(true)}
               aria-expanded={open}
               aria-haspopup="dialog"
-              className={`${TAP} rounded-sm border border-bone/20 px-3.5 text-[11px] uppercase tracking-[0.16em] text-bone`}
+              className={`${TAP} rounded-sm border border-bone/20 px-3.5 text-[11px] uppercase tracking-[0.16em] text-bone lg:hidden`}
               aria-label="Open menu"
             >
               Menu
