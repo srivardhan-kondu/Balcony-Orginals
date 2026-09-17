@@ -96,3 +96,13 @@ frontend/node_modules/.cache/default-development/3.pack
 # Environment secrets
 .env
 **/.env
+
+# Working scratch in repo root — source material, already exported into
+# frontend/public/assets/. Kept on disk, out of the repo.
+/[0-9].jpg
+/[0-9].mp4
+/[0-9].HEIC
+/*.psd
+/*.crdownload
+/Poddutur Dassra.jpg
+/Andhra PradeshTourism Authority logos_2-04.png
