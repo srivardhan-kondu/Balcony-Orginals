@@ -8,6 +8,7 @@ const SCENES = {
   "/": "HOME",
   "/works": "THE ARCHIVE",
   "/upcoming": "UPCOMING",
+  "/gallery": "GALLERY",
   "/submit-story": "STORIES ARE GEMS",
   "/about": "ABOUT",
   "/contact": "CONTACT",
