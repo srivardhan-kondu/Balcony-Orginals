@@ -3,13 +3,91 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, Play, Music2, ExternalLink } from "lucide-react";
 import { api, STATUS_LABELS } from "@/lib/api";
 import { Reveal, MaskLines } from "@/components/Motion";
 import { MotionStill, Still } from "@/components/Still";
 import { SIZES } from "@/lib/images";
 import { ProjectCard, StatusChip } from "@/components/ProjectCard";
 import { ReelModal } from "@/components/ReelModal";
+
+/* ---------------------------------------------------------------------------
+   Extracts a YouTube video ID from any canonical YouTube URL.
+   --------------------------------------------------------------------------- */
+function ytId(url) {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1).split("?")[0];
+    if (u.hostname.includes("youtube.com"))
+      return u.searchParams.get("v") || u.pathname.split("/embed/")[1]?.split("?")[0] || null;
+  } catch { /* not a URL */ }
+  return null;
+}
+
+/* ---------------------------------------------------------------------------
+   One song card — thumbnail on left, title + play on right.
+   --------------------------------------------------------------------------- */
+const SongCard = ({ song, index }) => {
+  const id = ytId(song.url);
+  const thumb = id ? `https://i.ytimg.com/vi/${id}/mqdefault.jpg` : null;
+
+  const handlePlay = () => {
+    if (song.url) window.open(song.url, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <Reveal delay={index * 0.08}>
+      <div
+        className="group relative flex cursor-pointer items-stretch gap-0 overflow-hidden rounded-sm border border-line transition-all duration-300 hover:border-gold/40 hover:shadow-[0_0_30px_rgba(201,168,76,0.08)]"
+        onClick={handlePlay}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && handlePlay()}
+        aria-label={`Play ${song.title} on YouTube`}
+      >
+        {/* Thumbnail */}
+        <div className="relative shrink-0 overflow-hidden" style={{ width: "clamp(120px,18vw,200px)", aspectRatio: "16/9" }}>
+          {thumb ? (
+            <img
+              src={thumb}
+              alt={song.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              onError={(e) => { e.target.style.display = "none"; }}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-ink2">
+              <Music2 size={22} className="text-mute" />
+            </div>
+          )}
+          {/* Play overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-black/50">
+              <div style={{ width:0, height:0, borderTop:"7px solid transparent", borderBottom:"7px solid transparent", borderLeft:"11px solid white", marginLeft:"2px" }} />
+            </div>
+          </div>
+          {/* Gold left accent bar */}
+          <div className="absolute inset-y-0 left-0 w-[2px] bg-gold/0 transition-all duration-300 group-hover:bg-gold/70" />
+        </div>
+
+        {/* Info */}
+        <div className="flex flex-1 items-center justify-between gap-4 px-5 py-4">
+          <div>
+            <span className="block font-mono text-[9px] uppercase tracking-[0.24em] text-gold/70">Song</span>
+            <span className="mt-1.5 block font-serif text-[clamp(15px,1.4vw,19px)] text-bone/90 transition-colors group-hover:text-bone">
+              {song.title}
+            </span>
+          </div>
+          <ExternalLink
+            size={14}
+            className="shrink-0 text-mute opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-gold"
+          />
+        </div>
+      </div>
+    </Reveal>
+  );
+};
+
 
 const Chapter = ({ n, title, body, testid }) =>
   body ? (
@@ -146,7 +224,7 @@ export default function ProjectDetail({ project: initialProject, related: initia
                 className="group inline-flex items-center gap-3 rounded-sm bg-bone px-6 py-3.5 text-xs font-medium uppercase tracking-[0.15em] text-ink transition-colors duration-300 hover:bg-gold"
               >
                 <Play size={11} className="fill-current" />
-                {project.status === "completed" ? "Watch trailer" : "First look"}
+                {project.trailer ? "Watch Trailer" : project.status === "completed" ? "Watch trailer" : "First look"}
               </button>
               {project.confidential && (
                 <span className="inline-flex items-center rounded-sm border border-gold/40 px-4 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">
@@ -185,16 +263,49 @@ export default function ProjectDetail({ project: initialProject, related: initia
         <Chapter n="03" title="The People" body={project.people} testid="detail-people" />
       </section>
 
+      {/* Music */}
+      {project.songs && project.songs.length > 0 && (
+        <section
+          data-testid="detail-music"
+          className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(60px,9vh,110px)]"
+        >
+          <Reveal>
+            <div className="mb-8 flex items-center gap-3">
+              <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-bone/60">Music</span>
+            </div>
+          </Reveal>
+          <div className="flex flex-col gap-3">
+            {project.songs.map((song, i) => (
+              <SongCard key={song.url || i} song={song} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Gallery */}
       {project.gallery && project.gallery.length > 0 && (
         <section data-testid="detail-gallery" className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] pb-[clamp(60px,9vh,110px)]">
           <Reveal>
-            <h2 className="font-serif text-[clamp(22px,2.6vw,38px)] text-bone">Gallery</h2>
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-bone/60">Gallery</span>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-mute">
+                {project.gallery.length} stills
+              </span>
+            </div>
           </Reveal>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* Editorial grid — first image spans 2 cols as hero still */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {project.gallery.map((g, i) => (
-              <Reveal key={g + i} delay={i * 0.08}>
-                <div className="group overflow-hidden rounded-sm border border-line" style={{ aspectRatio: "16/10" }}>
+              <Reveal key={g + i} delay={i * 0.06}>
+                <div
+                  className={`group overflow-hidden rounded-sm border border-line transition-all duration-500 hover:border-gold/30 hover:shadow-[0_8px_40px_rgba(0,0,0,0.5)]${i === 0 ? " sm:col-span-2" : ""}`}
+                  style={{ aspectRatio: i === 0 ? "21/9" : "16/10" }}
+                >
                   <Still
                     src={g}
                     alt={`${project.title} — still ${i + 1}`}
@@ -273,6 +384,9 @@ export default function ProjectDetail({ project: initialProject, related: initia
         open={reelOpen}
         onClose={() => setReelOpen(false)}
         label={`${project.title.toUpperCase()} · ${STATUS_LABELS[project.status] || ""}`}
+        trailer={project.trailer}
+        src="/assets/balcony-intro.mp4"
+        poster={project.poster || "/assets/intro-poster.jpg"}
       />
     </div>
   );

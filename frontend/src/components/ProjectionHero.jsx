@@ -21,7 +21,7 @@ import { playLamp } from "@/lib/sound";
    sequencing and measurement, never per-frame work.
    --------------------------------------------------------------------------- */
 
-const HEADLINE = ["Stories rooted", "in culture.", "Told for the world."];
+const HEADLINE = ["Stories rooted", "in culture.", "Present to the world."];
 
 /** One masked headline line. The wrapper clips; the inner span is what rises. */
 const Line = ({ children, at: delay, dim = false }) => (
@@ -138,6 +138,19 @@ export const ProjectionHero = ({
 
       <ProjectionNav markRef={markRef} onOpenMenu={onOpenMenu} />
 
+      {/* ── AP Tourism logo — top-right prominent badge ── */}
+      <div
+        className="absolute right-[clamp(16px,3vw,40px)] top-[clamp(14px,2.4vh,28px)] z-[10] flex flex-col items-center gap-1.5"
+        style={{ ...anim(`bp-fade 1.2s ease ${at(T.eyebrow)} both`), opacity: 0 }}
+      >
+        <span className="font-mono text-[7.5px] uppercase tracking-[0.24em] text-white/30">In association with</span>
+        <img
+          src="/assets/ap-tourism-logo.png"
+          alt="Andhra Pradesh Tourism"
+          className="w-[clamp(80px,8vw,130px)] object-contain brightness-0 invert opacity-80 hover:opacity-100 transition-opacity duration-300"
+        />
+      </div>
+
       <main
         ref={copyRef}
         className="relative z-[2] flex w-full min-h-0 flex-1 flex-col items-center justify-start gap-[clamp(18px,2.6vh,34px)] px-[clamp(20px,4vw,56px)] pb-[clamp(40px,6vh,70px)] text-center short:gap-2 short:pb-6"
@@ -145,7 +158,7 @@ export const ProjectionHero = ({
       >
         <h1
           data-testid="hero-headline"
-          aria-label="Stories rooted in culture. Told for the world."
+          aria-label="Stories rooted in culture. Present to the world."
           className="m-0 font-display font-bold uppercase leading-[0.98] tracking-[-0.025em]"
           style={{ fontSize: "clamp(22px, 4.5vw, 78px)", textShadow: "0 0 110px rgba(220,224,228,.22)" }}
         >
@@ -161,11 +174,13 @@ export const ProjectionHero = ({
         <div
           data-anim="eyebrow"
           data-fit="1"
-          className="flex items-center gap-3 whitespace-nowrap font-mono text-[clamp(8px,.92vw,11px)] tracking-[0.2em] opacity-0"
-          style={{ color: "#b9b9b9", ...anim(`bp-fade 1s ease ${at(T.eyebrow)} both`) }}
+          className="flex flex-col items-center gap-2 opacity-0"
+          style={{ ...anim(`bp-fade 1s ease ${at(T.eyebrow)} both`) }}
         >
-          <span aria-hidden="true" className="h-[7px] w-[7px] rotate-45 bg-[#ec3013]" />
-          <span>PRODUCTION HOUSE · EST. RAYALASEEMA</span>
+          <div className="flex items-center gap-3 whitespace-nowrap font-mono text-[clamp(8px,.92vw,11px)] tracking-[0.2em]" style={{ color: "#b9b9b9" }}>
+            <span aria-hidden="true" className="h-[7px] w-[7px] rotate-45 bg-[#ec3013]" />
+            <span>PRODUCTION HOUSE · EST. RAYALASEEMA</span>
+          </div>
         </div>
 
         <p
