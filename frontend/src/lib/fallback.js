@@ -22,6 +22,7 @@ export const PROJECTS_FALLBACK = [
     hero: "/assets/projects/proddatur-hero.jpg",
     poster: "/assets/projects/proddatur-hero.jpg",
     trailer: "/assets/videos/proddatur-trailer.mp4",
+    watch: { platform: "ETV Win", url: "https://www.etvwin.com/movies/proddatur-dussehra/690c62e870c5938318000941" },
     songs: [
       { title: "Proddatur Kobali", url: "https://youtu.be/CCS1FveSUeU?si=i0bUv6qwkN44Rq0-" },
     ],

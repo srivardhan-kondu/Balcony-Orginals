@@ -226,6 +226,25 @@ export default function ProjectDetail({ project: initialProject, related: initia
                 <Play size={11} className="fill-current" />
                 {project.trailer ? "Watch Trailer" : project.status === "completed" ? "Watch trailer" : "First look"}
               </button>
+              {/* Where the finished film actually streams. Named rather than a
+                  bare "Watch Now" — this leaves the site, and saying so before
+                  the click is the difference between a link and a trapdoor. */}
+              {project.watch?.url && (
+                <a
+                  href={project.watch.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="detail-watch-now-btn"
+                  aria-label={`Watch ${project.title} on ${project.watch.platform} (opens in a new tab)`}
+                  className="group inline-flex items-center gap-3 rounded-sm border border-bone/25 px-6 py-3.5 text-xs font-medium uppercase tracking-[0.15em] text-bone transition-colors duration-300 hover:border-gold hover:text-gold"
+                >
+                  Watch Now
+                  <span className="font-mono text-[10px] tracking-[0.18em] text-bone/45 transition-colors group-hover:text-gold/70">
+                    {project.watch.platform}
+                  </span>
+                  <ExternalLink size={12} className="shrink-0" />
+                </a>
+              )}
               {project.confidential && (
                 <span className="inline-flex items-center rounded-sm border border-gold/40 px-4 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">
                   Details under wraps
