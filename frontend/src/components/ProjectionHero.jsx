@@ -138,17 +138,39 @@ export const ProjectionHero = ({
 
       <ProjectionNav markRef={markRef} onOpenMenu={onOpenMenu} />
 
-      {/* ── AP Tourism logo — top-right prominent badge ── */}
+      {/* ── AP Tourism recognition ──
+          A row of its own under the nav, not an overlay across it. Floated at
+          top-right with a z-index it covered whatever the nav put in that
+          corner — the submit button on desktop, the frame readout on a phone —
+          and no set of coordinates fixes that at every breakpoint, because the
+          thing underneath changes size and identity as the layout switches.
+          In flow it simply cannot collide: it is laid out after the nav and
+          before the copy, and the browser keeps them apart.
+
+          The height it takes comes out of the gap the copy block already
+          leaves above itself (`--bp-pt`), so the composition below is
+          unchanged; use-projection-fit re-measures from main's new top and
+          absorbs the rest. That trade holds everywhere but a phone on its
+          side: at 844x390 the mark would claim 65px of the ~390px the whole
+          hero has, and the copy is already the thing being squeezed there. So
+          it steps down through `short:` and stands aside at `shorter:`, the
+          same concession the replay button makes, and the global Header
+          carries the recognition the moment the hero is scrolled past. */}
       <div
-        className="absolute right-[clamp(16px,3vw,40px)] top-[clamp(14px,2.4vh,28px)] z-[10] flex flex-col items-center gap-1.5"
+        data-testid="hero-ap-tourism"
+        className="relative z-[3] flex justify-end px-[clamp(18px,4vw,56px)] pt-[clamp(6px,1.2vh,14px)] shorter:hidden"
         style={{ ...anim(`bp-fade 1.2s ease ${at(T.eyebrow)} both`), opacity: 0 }}
       >
-        <span className="font-mono text-[7.5px] uppercase tracking-[0.24em] text-white/30">In association with</span>
-        <img
-          src="/assets/ap-tourism-logo.png"
-          alt="Andhra Pradesh Tourism"
-          className="w-[clamp(80px,8vw,130px)] object-contain brightness-0 invert opacity-80 hover:opacity-100 transition-opacity duration-300"
-        />
+        <div className="flex flex-col items-center gap-1.5">
+          <span className="font-mono text-[7.5px] uppercase tracking-[0.24em] text-white/30">In association with</span>
+          <img
+            src="/assets/ap-tourism-logo.png"
+            alt="Andhra Pradesh Tourism"
+            width="915"
+            height="557"
+            className="w-[clamp(80px,8vw,130px)] object-contain brightness-0 invert opacity-80 transition-opacity duration-300 hover:opacity-100 short:w-[88px]"
+          />
+        </div>
       </div>
 
       <main

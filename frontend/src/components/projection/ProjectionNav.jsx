@@ -15,6 +15,11 @@ const LEFT = [
   { to: "/works?type=feature", label: "FILMS" },
   { to: "/upcoming", label: "UPCOMING" },
 ];
+/* SUBMIT YOUR STORY used to sit at the end of this row as a bordered button.
+   It was the same link the hero already offers in its own centre CTA row, so
+   it was on screen twice at once, and it held the corner the AP Tourism
+   recognition needs. The centre row keeps it; the global Header keeps it once
+   the hero is scrolled past. */
 const RIGHT = [
   { to: "/about", label: "ABOUT" },
   { to: "/contact", label: "CONTACT" },
@@ -22,9 +27,9 @@ const RIGHT = [
 
 const link = "font-mono text-xs tracking-[0.24em] transition-colors duration-200";
 /* Height as well as width. At 844x390 — a phone on its side — the viewport is
-   "desktop" by width alone, but there is no room beside the lamp for five links
-   and a button: they ran straight over the mark. Short viewports take the
-   compact row instead. */
+   "desktop" by width alone, but there is no room beside the lamp for five
+   links: they ran straight over the mark. Short viewports take the compact
+   row instead. */
 const DESKTOP = "(min-width: 760px) and (min-height: 600px)";
 
 export const ProjectionNav = ({ markRef, onOpenMenu }) => {
@@ -77,14 +82,6 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/submit-story"
-            data-testid="hero-nav-submit"
-            className={`${link} flex items-center gap-2.5 border border-[#2f2f2f] px-5 py-[13px] text-[#e6e6e6] hover:border-[#f2f2f2] hover:text-white`}
-          >
-            <span aria-hidden="true" className="h-[7px] w-[7px] rotate-45 bg-[#ec3013]" />
-            <span className="whitespace-nowrap">SUBMIT YOUR STORY</span>
-          </Link>
         </div>
       ) : (
         <div
