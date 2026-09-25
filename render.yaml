@@ -27,3 +27,8 @@ services:
       # ^https://balcony-originals-.*\.vercel\.app$
       - key: CORS_ORIGIN_REGEX
         sync: false
+      # Resend API key — every form submission is emailed to NOTIFY_EMAIL.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: NOTIFY_EMAIL
+        value: balcony.originals@gmail.com

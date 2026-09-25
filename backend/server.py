@@ -2,6 +2,8 @@ from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+import httpx
+import html
 import os
 import re
 import logging
@@ -29,6 +31,63 @@ if MONGO_URL:
     db = client[DB_NAME]
 else:
     logger.warning("MONGO_URL is not set — API will start, but data endpoints return 503 until it is configured.")
+
+
+# Resend delivers every form submission to the team's inbox. Without a verified
+# sending domain Resend only allows onboarding@resend.dev as the sender, and only
+# to the address that owns the Resend account — which is why that is the default.
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "").strip()
+NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", "balcony.originals@gmail.com").strip()
+RESEND_FROM = os.environ.get("RESEND_FROM", "Balcony Originals <onboarding@resend.dev>").strip()
+if not RESEND_API_KEY:
+    logger.warning("RESEND_API_KEY is not set — form submissions will not be emailed.")
+
+
+async def send_notification(subject: str, fields: list, reply_to: str) -> bool:
+    """Emails a submission to NOTIFY_EMAIL. Never raises: returns whether it sent."""
+    if not RESEND_API_KEY:
+        return False
+    rows = "".join(
+        f'<tr><td style="padding:6px 12px;vertical-align:top;color:#666;white-space:nowrap">{html.escape(k)}</td>'
+        f'<td style="padding:6px 12px;white-space:pre-wrap">{html.escape(str(v or "—"))}</td></tr>'
+        for k, v in fields
+    )
+    text = "\n".join(f"{k}: {v or '—'}" for k, v in fields)
+    payload = {
+        "from": RESEND_FROM,
+        "to": [NOTIFY_EMAIL],
+        "reply_to": reply_to,
+        "subject": subject,
+        "html": f'<h2 style="font-family:sans-serif">{html.escape(subject)}</h2>'
+                f'<table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">{rows}</table>',
+        "text": text,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=10) as http:
+            r = await http.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+                json=payload,
+            )
+        if r.status_code >= 300:
+            logger.error("Resend rejected the email (%s): %s", r.status_code, r.text)
+            return False
+        return True
+    except Exception as exc:
+        logger.error("Could not reach Resend: %s", exc)
+        return False
+
+
+async def store(collection: str, doc: dict) -> bool:
+    """Saves a submission when a database is attached. Never raises."""
+    if db is None:
+        return False
+    try:
+        await db[collection].insert_one(doc)
+        return True
+    except Exception as exc:
+        logger.error("Could not save to %s: %s", collection, exc)
+        return False
 
 
 def require_db():
@@ -285,7 +344,6 @@ async def get_project(slug: str):
 async def create_submission(payload: StorySubmission):
     if payload.website:
         return {"ok": True}
-    database = require_db()
     if not payload.name.strip():
         raise HTTPException(status_code=422, detail="Name is required")
     if not EMAIL_RE.match(payload.email):
@@ -298,7 +356,19 @@ async def create_submission(payload: StorySubmission):
     doc.pop("website", None)
     doc["status"] = "New"
     doc["created_at"] = datetime.now(timezone.utc).isoformat()
-    await database.story_submissions.insert_one(doc)
+    emailed = await send_notification(
+        f"New story submission — {payload.name.strip()}",
+        [
+            ("Name", payload.name), ("Email", payload.email), ("Phone", payload.phone),
+            ("Location", payload.location), ("Category", payload.category),
+            ("Story in one line", payload.one_line_story), ("Note", payload.note),
+            ("Consent", "Yes" if payload.consent else "No"), ("Received", doc["created_at"]),
+        ],
+        payload.email,
+    )
+    saved = await store("story_submissions", doc)
+    if not (emailed or saved):
+        raise HTTPException(status_code=503, detail="We couldn't send your story right now. Please try again shortly.")
     return {"ok": True, "message": "Thank you for trusting us with your story. Our team will review your submission and reach out if it fits our current storytelling or production interests."}
 
 
@@ -306,7 +376,6 @@ async def create_submission(payload: StorySubmission):
 async def create_contact(payload: ContactMessage):
     if payload.website:
         return {"ok": True}
-    database = require_db()
     if not payload.name.strip():
         raise HTTPException(status_code=422, detail="Name is required")
     if not EMAIL_RE.match(payload.email):
@@ -317,7 +386,17 @@ async def create_contact(payload: ContactMessage):
     doc.pop("website", None)
     doc["status"] = "New"
     doc["created_at"] = datetime.now(timezone.utc).isoformat()
-    await database.contact_messages.insert_one(doc)
+    emailed = await send_notification(
+        f"Contact: {payload.subject or 'General enquiry'} — {payload.name.strip()}",
+        [
+            ("Name", payload.name), ("Email", payload.email), ("Subject", payload.subject),
+            ("Message", payload.message), ("Received", doc["created_at"]),
+        ],
+        payload.email,
+    )
+    saved = await store("contact_messages", doc)
+    if not (emailed or saved):
+        raise HTTPException(status_code=503, detail="We couldn't send your message right now. Please try again shortly.")
     return {"ok": True, "message": "Thank you — we have it. We'll get back to you soon."}
 
 

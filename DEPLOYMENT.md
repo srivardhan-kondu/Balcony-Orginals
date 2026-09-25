@@ -25,6 +25,8 @@ Set these in the dashboard when prompted:
 | `MONGO_URL` | **Leave blank for now.** Paste the Atlas URI when you have it. |
 | `DB_NAME` | `balcony_originals` |
 | `CORS_ORIGINS` | Leave blank for now — you'll set it in step 3. |
+| `RESEND_API_KEY` | Your Resend API key (`re_...`). Every form submission is emailed with it. |
+| `NOTIFY_EMAIL` | `balcony.originals@gmail.com` — where submissions arrive. |
 
 The service boots green with no database attached: `/api/health` returns 200 with
 `"database": "not_configured"`, and the data endpoints return a clean 503 until
@@ -157,8 +159,12 @@ yarn dev                      # or: yarn build && yarn start
   `frontend/public/assets/projects/` came from
   [`scripts/generate_images.py`](scripts/generate_images.py). Swap in real
   production stills before launch.
-- **Submissions are write-only.** Story and contact submissions land in MongoDB
-  with no admin UI and no email alert — you'll need to read them in Atlas until
-  the admin panel exists.
+- **Submissions arrive by email.** Every story submission and contact message is
+  emailed to `NOTIFY_EMAIL` through Resend (reply to the email to answer the
+  sender), and also saved to MongoDB when one is attached. A form only fails if
+  both the email and the database fail. Until you verify a domain in Resend, the
+  sender is `onboarding@resend.dev` and Resend will only deliver to the address
+  that owns the Resend account — so `NOTIFY_EMAIL` must be that address. Once a
+  domain is verified, set `RESEND_FROM` to e.g. `Balcony Originals <hello@yourdomain.com>`.
 - **No rate limiting** on the public POST endpoints. The honeypot stops naive
   bots, nothing else does.
