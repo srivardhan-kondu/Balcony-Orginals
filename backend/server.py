@@ -153,7 +153,6 @@ PROJECTS_SEED = [
         "gallery": [
             "/assets/projects/proddatur-g1.jpg",
             "/assets/projects/proddatur-g2.jpg",
-            "/assets/projects/proddatur-g3.jpg",
             "/assets/projects/proddatur-g5.jpg",
             "/assets/projects/proddatur-g6.jpg",
             "/assets/projects/proddatur-2.jpg",

@@ -19,16 +19,17 @@ import { Marquee } from "@/components/Marquee";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SlateFocus } from "@/components/SlateFocus";
 import { ReelModal } from "@/components/ReelModal";
+import { StreamingBand } from "@/components/StreamingNow";
 
 /* ---------------------------------------------------------------------------
-   The four WebGL decorations, loaded after the page rather than with it.
+   The three WebGL decorations, loaded after the page rather than with it.
 
    Between them, `three` is 144KB gzipped — around a third of everything the
    home page ships, and more than the rest of the home page put together. All
-   four are `aria-hidden` set dressing: a camera turning slowly in the corner of
-   the films section, a reel ghosted behind the slate, a film strip rippling
-   across a band, a projector beam over the gems still. Not one of them carries
-   meaning, none is above the fold, and two are already gated to desktop.
+   three are `aria-hidden` set dressing: a camera turning slowly behind the
+   feature card, a film strip rippling across a band, a projector beam over the
+   gems still. Not one of them carries meaning, none is above the fold, and the
+   camera is gated to desktop.
 
    `ssr: false` because there is nothing for the server to render — each mounts
    a <canvas> and paints into it — and because it keeps three out of the
@@ -36,7 +37,6 @@ import { ReelModal } from "@/components/ReelModal";
    catch up.
    --------------------------------------------------------------------------- */
 const CineCamera = dynamic(() => import("@/components/CineCamera").then((m) => m.CineCamera), { ssr: false });
-const FilmReel = dynamic(() => import("@/components/FilmReel").then((m) => m.FilmReel), { ssr: false });
 const ProjectorBeam = dynamic(() => import("@/components/ProjectorBeam").then((m) => m.ProjectorBeam), { ssr: false });
 /* FilmRibbon defers its own canvas — see the note there — so it is imported
    normally and keeps its band in the prerendered HTML. */
@@ -143,6 +143,7 @@ export default function Home({ initialProjects = [] }) {
   const featured = projects.filter((p) => p.featured);
   const films = projects.filter((p) => p.type === "feature");
   const upcoming = projects.filter((p) => UPCOMING_STATUSES.includes(p.status));
+  const streaming = projects.find((p) => p.watch?.url);
 
   return (
     <div data-testid="home-page">
@@ -155,6 +156,9 @@ export default function Home({ initialProjects = [] }) {
       <ProjectionHero onOpenMenu={openMenu} onWatchReel={() => setReelOpen(true)} />
 
       <div className="relative z-[5] bg-ink">
+      {/* Below the hero rather than in it: the hero is a fitted composition
+          with no room left for a fourth call to action. */}
+      <StreamingBand project={streaming} />
       <Marquee />
 
       {/* ————— OUR ROOTS ————— */}
@@ -283,9 +287,6 @@ export default function Home({ initialProjects = [] }) {
 
       {/* ————— FEATURE FILMS ————— */}
       <section data-testid="films-section" className="relative overflow-hidden border-t border-line py-[clamp(80px,12vh,150px)]">
-        {isDesktop && (
-          <CineCamera className="pointer-events-none absolute right-[3%] top-[2%] z-0 h-[420px] w-[420px]" />
-        )}
         <div className="relative z-[2] mx-auto max-w-[1560px] px-[var(--bo-gutter)]">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>
@@ -304,12 +305,21 @@ export default function Home({ initialProjects = [] }) {
                 </SectionLink>
               </div>
             </Reveal>
-            <div>
-              {films.map((p) => (
-                <Reveal key={p.slug} delay={0.15}>
-                  <ProjectCard project={p} large sizes={SIZES.half} />
-                </Reveal>
-              ))}
+            {/* The camera is anchored to the card, not the section, and set off
+                its top-left corner: still behind the image, but most of it in
+                view. Placed against the section it sat squarely behind the card
+                and could not be seen at all. */}
+            <div className="relative">
+              {isDesktop && (
+                <CineCamera className="pointer-events-none absolute -left-[32%] -top-[40%] z-0 aspect-square w-[66%]" />
+              )}
+              <div className="relative z-[1]">
+                {films.map((p) => (
+                  <Reveal key={p.slug} delay={0.15}>
+                    <ProjectCard project={p} large sizes={SIZES.half} />
+                  </Reveal>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -319,9 +329,6 @@ export default function Home({ initialProjects = [] }) {
 
       {/* ————— UPCOMING ————— */}
       <section data-testid="upcoming-section" className="relative overflow-hidden border-t border-line bg-ink2/40 py-[clamp(80px,12vh,150px)]">
-        {isDesktop && (
-          <FilmReel className="pointer-events-none absolute -right-[7%] top-1/2 z-0 h-[620px] w-[620px] -translate-y-1/2 opacity-20" />
-        )}
         <div className="relative z-[2] mx-auto max-w-[1560px] px-[var(--bo-gutter)]">
           <Reveal className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -376,11 +383,8 @@ export default function Home({ initialProjects = [] }) {
         <div className="mx-auto grid max-w-[1560px] gap-14 px-[var(--bo-gutter)] py-[clamp(80px,12vh,150px)] lg:grid-cols-[1fr_1.2fr]">
           <Reveal>
             <Overline testid="why-overline">Why we tell stories</Overline>
-            <div className="font-telugu text-[clamp(26px,3vw,40px)] leading-[1.5] text-gold/90">
-              ప్రతి కథ ఒక రత్నం
-            </div>
-            <div className="mt-3 font-mono text-[10px] tracking-[0.24em] text-dim">
-              EVERY STORY IS A GEM
+            <div className="font-serif text-[clamp(26px,3vw,40px)] leading-[1.3] text-gold/90">
+              Every story is a gem.
             </div>
           </Reveal>
           <Reveal delay={0.12}>

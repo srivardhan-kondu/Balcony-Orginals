@@ -21,6 +21,7 @@
 
 import { PROJECTS_FALLBACK } from "@/lib/fallback";
 import { UPCOMING_STATUSES } from "@/lib/api";
+import { curateAll } from "@/lib/curate";
 
 const BASE = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
 
@@ -55,7 +56,7 @@ export const getProjects = async () => {
          own HTML would otherwise sail through and take the build down later,
          on `projects.filter(...)`. */
       if (Array.isArray(data) && data.length) {
-        cached = [...data].sort(byOrder);
+        cached = curateAll([...data].sort(byOrder));
         return cached;
       }
     } catch {
@@ -63,7 +64,7 @@ export const getProjects = async () => {
     }
   }
 
-  cached = [...PROJECTS_FALLBACK].sort(byOrder);
+  cached = curateAll([...PROJECTS_FALLBACK].sort(byOrder));
   return cached;
 };
 

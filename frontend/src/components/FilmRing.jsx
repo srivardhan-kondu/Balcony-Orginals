@@ -6,7 +6,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import { STATUS_LABELS } from "@/lib/api";
 import { Still } from "@/components/Still";
 import { SIZES } from "@/lib/images";
-import { getAudioContext, getMaster, isSoundEnabled, setSoundEnabled, subscribeSound } from "@/lib/sound";
+import { getAudioContext, getMaster, isSoundEnabled, isSoundUnlocked, setSoundEnabled, subscribeSound } from "@/lib/sound";
 
 export const FilmRing = ({ projects = [] }) => {
   const router = useRouter();
@@ -38,14 +38,18 @@ export const FilmRing = ({ projects = [] }) => {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  useEffect(
-    () =>
-      subscribeSound((v) => {
-        setSoundOn(v);
-        soundRef.current = v;
-      }),
-    []
-  );
+  /* Sound is on by default, so the whir starts by itself as soon as the
+     browser lets audio run (the first click or tap anywhere on the page) —
+     or straight away if that already happened before this mounted. */
+  useEffect(() => {
+    if (isSoundEnabled() && isSoundUnlocked()) ensureWhir();
+    return subscribeSound((v) => {
+      setSoundOn(v);
+      soundRef.current = v;
+      if (v && isSoundUnlocked()) ensureWhir();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let raf;

@@ -162,10 +162,10 @@ export const ProjectionHero = ({
         style={{ ...anim(`bp-fade 1.2s ease ${at(T.eyebrow)} both`), opacity: 0 }}
       >
         <div className="flex flex-col items-center gap-1.5">
-          <span className="font-mono text-[7.5px] uppercase tracking-[0.24em] text-white/30">In association with</span>
+          <span className="font-mono text-[8px] uppercase tracking-[0.24em] text-white/45">Recognized by</span>
           <img
             src="/assets/ap-tourism-logo.png"
-            alt="Andhra Pradesh Tourism"
+            alt="Recognized by Andhra Pradesh Tourism"
             width="915"
             height="557"
             className="w-[clamp(80px,8vw,130px)] object-contain brightness-0 invert opacity-80 transition-opacity duration-300 hover:opacity-100 short:w-[88px]"
@@ -201,7 +201,7 @@ export const ProjectionHero = ({
         >
           <div className="flex items-center gap-3 whitespace-nowrap font-mono text-[clamp(8px,.92vw,11px)] tracking-[0.2em]" style={{ color: "#b9b9b9" }}>
             <span aria-hidden="true" className="h-[7px] w-[7px] rotate-45 bg-[#ec3013]" />
-            <span>PRODUCTION HOUSE · EST. RAYALASEEMA</span>
+            <span>PRODUCTION HOUSE · EST. TELANGANA &amp; RAYALASEEMA, AP</span>
           </div>
         </div>
 

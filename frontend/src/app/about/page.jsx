@@ -6,7 +6,7 @@ import { pageMetadata } from "@/lib/site";
 
 const TITLE = "About";
 const DESCRIPTION =
-  "Balcony Originals is a production house rooted in Rayalaseema, built on one belief: culture, devotion, heritage, people and lived experience deserve to be documented — and brought to a wider audience.";
+  "Balcony Originals is a production house established in Telangana and in Rayalaseema, Andhra Pradesh, built on one belief: culture, devotion, heritage, people and lived experience deserve to be documented — and brought to a wider audience.";
 
 export const metadata = pageMetadata({
   title: TITLE,
@@ -29,7 +29,7 @@ export default function AboutPage() {
         testid="about-hero"
         overline="About the house"
         titleLines={["A production house that begins", "with a place, but is not", "limited to it."]}
-        sub="Balcony Originals is rooted in Rayalaseema and built on one belief: culture, devotion, heritage, people and lived experience deserve to be documented — and brought to a wider audience."
+        sub="Balcony Originals is a production house established in Telangana and in Rayalaseema, Andhra Pradesh, built on one belief: culture, devotion, heritage, people and lived experience deserve to be documented — and brought to a wider audience."
       />
 
       <About />

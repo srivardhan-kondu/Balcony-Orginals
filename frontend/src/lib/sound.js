@@ -1,9 +1,18 @@
 let ctx = null;
 let master = null;
-let enabled = false;
+/* Sound is on by default — the reel whir, the clapper and the projector lamp
+   are part of the experience. Browsers still refuse any audio until the
+   visitor has interacted with the page, so the context is unlocked on the
+   first click, tap or key press (below) and the sounds start from there. The
+   mute toggles still turn it all off. */
+let enabled = true;
+let unlocked = false;
 const listeners = new Set();
 
 export const isSoundEnabled = () => enabled;
+
+/** True once the browser has let the audio context run. */
+export const isSoundUnlocked = () => unlocked;
 
 export const subscribeSound = (fn) => {
   listeners.add(fn);
@@ -35,6 +44,26 @@ export const setSoundEnabled = async (v) => {
   }
   listeners.forEach((fn) => fn(enabled));
 };
+
+/* Unlock audio on the first user gesture. Listeners are told once the context
+   is running, so anything waiting to start (the reel whir) can begin. */
+if (typeof window !== "undefined") {
+  const GESTURES = ["pointerdown", "keydown", "touchend", "click"];
+  const unlock = async () => {
+    const c = getAudioContext();
+    if (!c) return;
+    if (c.state === "suspended") {
+      try {
+        await c.resume();
+      } catch {}
+    }
+    if (c.state !== "running" || unlocked) return;
+    unlocked = true;
+    GESTURES.forEach((g) => window.removeEventListener(g, unlock, true));
+    listeners.forEach((fn) => fn(enabled));
+  };
+  GESTURES.forEach((g) => window.addEventListener(g, unlock, true));
+}
 
 const makeNoiseBuffer = (c, seconds) => {
   const len = Math.floor(c.sampleRate * seconds);

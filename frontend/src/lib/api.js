@@ -1,5 +1,6 @@
 import axios from "axios";
 import { PROJECTS_FALLBACK } from "@/lib/fallback";
+import { curate, curateAll } from "@/lib/curate";
 
 // NEXT_PUBLIC_* is inlined at build time, so this is baked into the bundle by
 // Vercel. Trailing slashes are stripped, and an unset var falls back to a
@@ -38,13 +39,14 @@ export const api = {
     axios
       .get(`${API}/projects`, { params })
       .then((r) => (Array.isArray(r.data) ? r.data : filterFallback(params)))
-      .catch(() => filterFallback(params)),
+      .catch(() => filterFallback(params))
+      .then(curateAll),
   project: (slug) =>
     axios
       .get(`${API}/projects/${slug}`)
       .then((r) => (r.data && typeof r.data === "object" && r.data.slug ? r.data : null))
       .catch(() => null)
-      .then((p) => p || fallbackProject(slug)),
+      .then((p) => curate(p || fallbackProject(slug))),
   submitStory: (data) => axios.post(`${API}/story-submissions`, data).then((r) => r.data),
   contact: (data) => axios.post(`${API}/contact`, data).then((r) => r.data),
 };

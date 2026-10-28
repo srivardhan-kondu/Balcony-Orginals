@@ -226,7 +226,7 @@ export const Header = () => {
           <div className="flex flex-none items-center gap-3.5">
             <img
               src="/assets/ap-tourism.png"
-              alt="Recognised by Andhra Pradesh Tourism"
+              alt="Recognized by Andhra Pradesh Tourism"
               width="362"
               height="216"
               className="block h-[30px] w-auto opacity-85 lg:h-[38px]"

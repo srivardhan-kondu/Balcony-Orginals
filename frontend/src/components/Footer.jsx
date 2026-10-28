@@ -17,9 +17,9 @@ export const Footer = () => (
             Stories rooted in culture. Told for the world.
           </p>
           <p className="mt-6 font-mono text-[10.5px] leading-relaxed tracking-[0.18em] text-dim">
-            PRODUCTION HOUSE · RAYALASEEMA
+            PRODUCTION HOUSE · TELANGANA
             <br />
-            ANDHRA PRADESH · INDIA
+            RAYALASEEMA, ANDHRA PRADESH · INDIA
           </p>
         </div>
         <div>

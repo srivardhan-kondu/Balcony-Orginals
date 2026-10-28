@@ -78,8 +78,8 @@ export default function SubmitStory() {
         <div className="grid gap-14 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <div className="lg:sticky lg:top-32">
-              <div className="font-telugu text-[clamp(24px,2.6vw,36px)] leading-[1.5] text-gold/90">
-                ప్రతి కథ ఒక రత్నం
+              <div className="font-serif text-[clamp(24px,2.6vw,36px)] leading-[1.3] text-gold/90">
+                Every story is a gem.
               </div>
               <p className="mt-6 max-w-[46ch] text-[15px] leading-[1.75] text-mute">
                 You don't need a screenplay. You don't need contacts in the industry. If the story is true and

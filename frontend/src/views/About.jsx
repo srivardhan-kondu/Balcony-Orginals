@@ -57,15 +57,24 @@ export default function About() {
               <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
               <span className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-bone/60">The idea</span>
             </div>
-            <div className="mt-6 font-telugu text-[clamp(24px,2.6vw,36px)] leading-[1.5] text-gold/90">
-              కథలు మా మూలాలు
+            <div className="mt-6 font-serif text-[clamp(24px,2.6vw,36px)] leading-[1.3] text-gold/90">
+              Stories are our roots.
+            </div>
+            <div data-testid="about-established" className="mt-8 border-l border-gold/50 pl-4">
+              <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-dim">Production house · Est.</div>
+              <div className="mt-2 font-mono text-[11.5px] uppercase leading-[1.9] tracking-[0.18em] text-bone/80">
+                Telangana
+                <br />
+                Rayalaseema, Andhra Pradesh
+              </div>
             </div>
           </Reveal>
           <Reveal delay={0.1}>
             <div className="space-y-6 text-[clamp(15px,1.3vw,18px)] leading-[1.8] text-bone/85">
               <p>
-                Balcony Originals begins with a place, but it is not limited to a place. Its roots are in
-                Rayalaseema; its stories can travel across Andhra Pradesh, India and the world.
+                Balcony Originals is a production house established in Telangana and in Rayalaseema, Andhra
+                Pradesh. It begins with a place, but it is not limited to a place — its stories can travel across
+                India and the world.
               </p>
               <p>
                 From devotional and cultural documentaries to feature films, we look for stories with identity,
