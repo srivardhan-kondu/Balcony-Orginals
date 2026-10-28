@@ -48,7 +48,6 @@ export const FilmRing = ({ projects = [] }) => {
       soundRef.current = v;
       if (v && isSoundUnlocked()) ensureWhir();
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -99,10 +98,17 @@ export const FilmRing = ({ projects = [] }) => {
     };
   }, []);
 
+  /* The ring captures the pointer so a drag keeps turning it even when the
+     cursor leaves the reel. Capture also sends the `click` to the ring rather
+     than to the poster under the cursor, so a panel's own onClick never
+     fired. The poster is read at pointerdown instead, and opened on pointerup
+     if the press was a tap rather than a drag. */
+  const pressed = useRef(null);
   const down = (e) => {
     dragging.current = true;
     moved.current = 0;
     lastX.current = e.clientX;
+    pressed.current = e.target.closest?.("[data-slug]")?.dataset.slug || null;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
   const move = (e) => {
@@ -115,6 +121,13 @@ export const FilmRing = ({ projects = [] }) => {
   };
   const up = () => {
     dragging.current = false;
+    const slug = pressed.current;
+    pressed.current = null;
+    if (slug && moved.current < 8) router.push(`/projects/${slug}`);
+  };
+  const cancel = () => {
+    dragging.current = false;
+    pressed.current = null;
   };
 
   const ensureWhir = () => {
@@ -175,7 +188,7 @@ export const FilmRing = ({ projects = [] }) => {
         onPointerDown={down}
         onPointerMove={move}
         onPointerUp={up}
-        onPointerCancel={up}
+        onPointerCancel={cancel}
       >
         <div
           ref={ringRef}
@@ -192,9 +205,7 @@ export const FilmRing = ({ projects = [] }) => {
               key={`${p.slug}-${i}`}
               ref={(el) => (panelRefs.current[i] = el)}
               data-testid={`film-ring-panel-${i}`}
-              onClick={() => {
-                if (moved.current < 8) router.push(`/projects/${p.slug}`);
-              }}
+              data-slug={p.slug}
               className="group absolute inset-0 cursor-pointer"
               style={{
                 transform: `rotateY(${(360 / n) * i}deg) translateZ(${size.r}px)`,

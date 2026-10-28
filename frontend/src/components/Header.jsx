@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/components/Motion";
+import { HomeLink } from "@/components/HomeLink";
 import { useOverlay } from "@/hooks/use-overlay";
 import { useSiteChromeVisible } from "@/hooks/use-past-hero";
 
@@ -207,13 +208,13 @@ export const Header = () => {
         }`}
       >
         <div className="mx-auto flex h-[var(--bo-header-h)] max-w-[1560px] items-center justify-between gap-5 px-[var(--bo-gutter)]">
-          <Link href="/" data-testid="nav-link-home" className="flex flex-none items-center gap-3" aria-label="Balcony Originals — home">
+          <HomeLink data-testid="nav-link-home" className="flex flex-none items-center gap-3" aria-label="Balcony Originals — home">
             {/* Intrinsic dimensions: without them the bar reflows the moment the
                 marks decode, on every cold load. */}
             <img src="/assets/bo-mark.png" alt="Balcony Originals" width="211" height="284" className="block h-[29px] w-auto" />
             <span className="h-[22px] w-px bg-bone/20" />
             <img src="/assets/bo-wordmark.png" alt="" width="491" height="49" className="block h-[10px] w-auto opacity-90" />
-          </Link>
+          </HomeLink>
 
           <Suspense fallback={<DesktopNav current={pathname} />}>
             <ActiveDesktopNav />

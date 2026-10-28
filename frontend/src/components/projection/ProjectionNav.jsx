@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HomeLink } from "@/components/HomeLink";
 import { LampMark } from "@/components/projection/LampMark";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { T, at, anim } from "@/lib/projection-timeline";
@@ -67,9 +68,9 @@ export const ProjectionNav = ({ markRef, onOpenMenu }) => {
         </button>
       )}
 
-      <Link href="/" aria-label="Balcony Originals — home" className="justify-self-center">
+      <HomeLink aria-label="Balcony Originals — home" className="justify-self-center">
         <LampMark ref={markRef} />
-      </Link>
+      </HomeLink>
 
       {desktop ? (
         <div

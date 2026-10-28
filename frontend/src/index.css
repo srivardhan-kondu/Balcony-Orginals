@@ -125,6 +125,16 @@
     input, textarea, select, button {
         font-family: inherit;
     }
+    /* The open option list is drawn by the browser, not the page. Left to
+       itself it painted the inherited light text on a white list, so the
+       options were invisible. Ask for the dark list and set both colours. */
+    select {
+        color-scheme: dark;
+    }
+    select option {
+        background-color: rgb(var(--bo-ink2));
+        color: rgb(var(--bo-bone));
+    }
 }
 
 @layer base {

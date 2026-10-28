@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { CopyrightYear } from "@/components/CopyrightYear";
+import { HomeLink } from "@/components/HomeLink";
 
 export const Footer = () => (
   <footer data-testid="site-footer" className="border-t border-line bg-ink">
     <div className="mx-auto max-w-[1560px] px-[var(--bo-gutter)] py-[clamp(48px,7vh,90px)]">
       <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <img
-            src="/assets/bo-lockup.png"
-            alt="Balcony Originals"
-            width="503"
-            height="347"
-            className="h-12 w-auto opacity-95"
-          />
+          <HomeLink data-testid="footer-home-link" aria-label="Balcony Originals — back to home" className="inline-block">
+            <img
+              src="/assets/bo-lockup.png"
+              alt="Balcony Originals"
+              width="503"
+              height="347"
+              className="h-12 w-auto opacity-95 transition-opacity hover:opacity-100"
+            />
+          </HomeLink>
           <p className="mt-6 max-w-[36ch] font-serif text-xl leading-snug text-sand md:text-2xl">
             Stories rooted in culture. Told for the world.
           </p>

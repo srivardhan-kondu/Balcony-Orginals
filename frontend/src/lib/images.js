@@ -35,8 +35,6 @@ export const SIZES = {
   full: "100vw",
   // sm:grid-cols-2 lg:grid-cols-3 inside the 1560px column
   grid3: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw",
-  // the screening-room track: w-[80vw] md:w-[44vw] lg:w-[34vw]
-  strip: "(min-width: 1024px) 34vw, (min-width: 768px) 44vw, 80vw",
   // one card beside a column of copy
   half: "(min-width: 1024px) 50vw, 100vw",
   // SlateFocus panel: lg:grid-cols-[1fr_1.15fr]
