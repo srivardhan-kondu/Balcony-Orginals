@@ -7,6 +7,7 @@ import { Grain } from "@/components/Grain";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Intro } from "@/components/Intro";
+import { LaunchCeremony } from "@/components/LaunchCeremony";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FootageCounter } from "@/components/FootageCounter";
 import { ClapperTransition } from "@/components/ClapperTransition";
@@ -142,6 +143,7 @@ export default function RootLayout({ children }) {
           <div className="min-h-screen bg-ink text-bone">
             <Grain />
             <Intro />
+            <LaunchCeremony />
             <Header />
             {/* Both of these read the query string, which a prerender has no
                 access to — so each needs a boundary Next can render in its

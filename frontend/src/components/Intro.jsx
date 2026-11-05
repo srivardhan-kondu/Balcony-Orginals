@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isLaunchRequested } from "@/lib/launch";
 
 /* How long the loader holds the screen. The film itself runs 2.33s, so it is
    played faster rather than cut: a hard stop would leave the wordmark half
@@ -34,9 +35,14 @@ let played = false;
 export const hasIntroPlayed = () => played;
 
 const announce = () => {
+  if (played) return;
   played = true;
   window.dispatchEvent(new Event(INTRO_DONE));
 };
+
+/* The launch ceremony (`?launch`) takes the splash's place, and calls this as
+   its screen opens so the page underneath starts on cue. */
+export const releaseIntro = announce;
 
 /** Play the film at whatever rate makes it finish in SPLASH_MS. */
 const fitToBeat = (video) => {
@@ -82,6 +88,14 @@ export const Intro = () => {
      outcomes are the whole of it: release the page immediately, or raise the
      overlay and let the effect below take over. */
   useEffect(() => {
+    if (isLaunchRequested()) {
+      // The ceremony owns the screen and releases the page itself. Mark the
+      // splash as seen so it does not play straight after the reveal.
+      try {
+        sessionStorage.setItem("bo-intro-seen", "1");
+      } catch {}
+      return;
+    }
     let seen = true;
     try {
       seen = !!sessionStorage.getItem("bo-intro-seen");

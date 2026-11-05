@@ -8,6 +8,7 @@ import { ProjectionNav } from "@/components/projection/ProjectionNav";
 import { ProjectionTelemetry, ProjectionFrame } from "@/components/projection/ProjectionTelemetry";
 import { useProjectionFit } from "@/hooks/use-projection-fit";
 import { INTRO_DONE, hasIntroPlayed } from "@/components/Intro";
+import { isLaunchRequested } from "@/lib/launch";
 import { T, at, anim } from "@/lib/projection-timeline";
 import { playLamp } from "@/lib/sound";
 
@@ -101,7 +102,9 @@ export const ProjectionHero = ({
     }
     // Belt and braces: if the splash never announces (it is skipped, or errors
     // out), the hero must not sit paused forever.
-    const failsafe = setTimeout(start, 4000);
+    // The launch ceremony holds the screen for as long as the guest takes to
+    // press LAUNCH, so it gets no failsafe: it always releases the hero itself.
+    const failsafe = isLaunchRequested() ? null : setTimeout(start, 4000);
     return () => {
       window.removeEventListener(INTRO_DONE, start);
       clearTimeout(failsafe);

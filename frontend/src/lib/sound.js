@@ -170,3 +170,64 @@ export const playClap = () => {
   osc.start(t0);
   osc.stop(t0 + 0.16);
 };
+
+/* Launch ceremony: the countdown leader's beep. A short, clean 1kHz tone, the
+   cue a projectionist counts down by; the last one is pitched up a fifth so the
+   room hears that it is the last. */
+export const playBeep = (final = false) => {
+  if (!enabled) return;
+  const c = getAudioContext();
+  if (!c || !master || c.state !== "running") return;
+  const t = c.currentTime + 0.005;
+  const o = c.createOscillator();
+  o.type = "sine";
+  o.frequency.value = final ? 1500 : 1000;
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.22, t + 0.008);
+  g.gain.setValueAtTime(0.22, t + (final ? 0.16 : 0.09));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + (final ? 0.26 : 0.16));
+  o.connect(g);
+  g.connect(master);
+  o.start(t);
+  o.stop(t + 0.3);
+};
+
+/* Launch ceremony: the reveal. A warm open chord that swells in under the
+   clap and blooms as the filter opens, then rings out over the live site. */
+export const playSwell = () => {
+  if (!enabled) return;
+  const c = getAudioContext();
+  if (!c || !master || c.state !== "running") return;
+  const t = c.currentTime + 0.02;
+
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.Q.value = 0.7;
+  lp.frequency.setValueAtTime(380, t);
+  lp.frequency.exponentialRampToValueAtTime(3200, t + 1.4);
+  lp.frequency.exponentialRampToValueAtTime(1200, t + 4.5);
+
+  const bus = c.createGain();
+  bus.gain.setValueAtTime(0.0001, t);
+  bus.gain.exponentialRampToValueAtTime(0.5, t + 0.7);
+  bus.gain.exponentialRampToValueAtTime(0.0001, t + 5);
+  lp.connect(bus);
+  bus.connect(master);
+
+  // A major, spread across two octaves, each voice gently detuned.
+  [110, 220, 277.18, 329.63, 440, 554.37].forEach((f, i) => {
+    [-4, 4].forEach((cents) => {
+      const o = c.createOscillator();
+      o.type = i === 0 ? "sine" : "triangle";
+      o.frequency.value = f;
+      o.detune.value = cents;
+      const g = c.createGain();
+      g.gain.value = i === 0 ? 0.12 : 0.05;
+      o.connect(g);
+      g.connect(lp);
+      o.start(t);
+      o.stop(t + 5.1);
+    });
+  });
+};
