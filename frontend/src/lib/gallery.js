@@ -7,12 +7,6 @@
 
 export const GALLERY_ITEMS = [
   {
-    src: "/assets/gallery/proddatur-3.jpg",
-    alt: "The full Balcony Originals crew on location for Proddatur Dussehra",
-    category: "Crew",
-    caption: "The full crew — Proddatur Dussehra",
-  },
-  {
     src: "/assets/gallery/proddatur-1.jpg",
     alt: "Official poster launch of Proddatur Dussehra with dignitaries",
     category: "Making",

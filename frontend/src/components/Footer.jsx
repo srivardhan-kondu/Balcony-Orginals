@@ -69,6 +69,17 @@ export const Footer = () => (
         <span className="font-mono text-[10px] tracking-[0.2em] text-dim">
           EVERY STORY IS A GEM
         </span>
+        <a
+          href="https://www.aadrique.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="footer-powered-by"
+          className="group inline-flex items-center gap-2.5 font-mono text-[13px] tracking-[0.2em] text-dim transition-colors hover:text-bone"
+        >
+          POWERED BY
+          <img src="/assets/aadrique-mark.png" alt="" width="20" height="22" className="h-[22px] w-auto" />
+          <span className="text-[15px] font-medium text-bone/80 transition-colors group-hover:text-[#f9972e]">AADRIQUE</span>
+        </a>
       </div>
     </div>
   </footer>

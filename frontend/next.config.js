@@ -29,6 +29,17 @@ const nextConfig = {
     unoptimized: true,
   },
 
+  // The feature film was renamed from "Untitled Feature"; old links still land.
+  async redirects() {
+    return [
+      {
+        source: "/projects/untitled-feature",
+        destination: "/projects/upcoming-feature-film",
+        permanent: true,
+      },
+    ];
+  },
+
   /* The stills, the splash and the brand film are content, not build output:
      they are versioned in public/ and change only when the films do. The long
      immutable cache belongs to /_next/static, which Next fingerprints itself;

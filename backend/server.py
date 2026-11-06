@@ -151,13 +151,14 @@ PROJECTS_SEED = [
             {"title": "Proddatur Kobali", "url": "https://youtu.be/CCS1FveSUeU?si=i0bUv6qwkN44Rq0-"}
         ],
         "gallery": [
+            "/assets/projects/proddatur-g10.jpg",
             "/assets/projects/proddatur-g1.jpg",
             "/assets/projects/proddatur-g2.jpg",
             "/assets/projects/proddatur-g5.jpg",
             "/assets/projects/proddatur-g6.jpg",
-            "/assets/projects/proddatur-2.jpg",
-            "/assets/projects/proddatur-3.jpg",
-            "/assets/projects/hero.jpg"
+            "/assets/projects/proddatur-g7.jpg",
+            "/assets/projects/proddatur-g8.jpg",
+            "/assets/projects/proddatur-g9.jpg"
         ],
         "credits": [
             {"role": "Direction & Production", "name": "Balcony Originals"},
@@ -247,8 +248,8 @@ PROJECTS_SEED = [
         "order": 4
     },
     {
-        "slug": "untitled-feature",
-        "title": "Untitled Feature",
+        "slug": "upcoming-feature-film",
+        "title": "Upcoming Feature Film",
         "telugu": "",
         "type": "feature",
         "status": "in-development",

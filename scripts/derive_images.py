@@ -114,9 +114,10 @@ def main() -> int:
             print(f"{master.name}  {native_w}x{native_h}")
 
             for w in LANDSCAPE_WIDTHS:
-                if w > native_w:
-                    continue
-                resized = img if w == native_w else img.resize(
+                # Every width the site asks for must exist, or that size 404s.
+                # A master narrower than the width is written at its own size
+                # rather than upscaled.
+                resized = img if w >= native_w else img.resize(
                     (w, round(native_h * w / native_w)), Image.LANCZOS
                 )
                 b, c = encode(resized, master.with_name(f"{master.stem}-{w}w.jpg"), args.force)
@@ -126,9 +127,7 @@ def main() -> int:
             cropped = portrait_crop(img)
             crop_w, crop_h = cropped.size
             for w in PORTRAIT_WIDTHS:
-                if w > crop_w:
-                    continue
-                resized = cropped if w == crop_w else cropped.resize(
+                resized = cropped if w >= crop_w else cropped.resize(
                     (w, round(crop_h * w / crop_w)), Image.LANCZOS
                 )
                 b, c = encode(resized, master.with_name(f"{master.stem}-p{w}w.jpg"), args.force)

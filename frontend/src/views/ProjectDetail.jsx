@@ -302,13 +302,17 @@ export default function ProjectDetail({ project: initialProject, related: initia
             </div>
           </Reveal>
 
-          {/* Editorial grid — first image spans 2 cols as hero still */}
+          {/* Editorial grid — the first image spans 2 cols as the hero still.
+              The span sits on the grid item (the Reveal), not the tile inside it.
+              On wide screens the hero matches the row height of its neighbour
+              instead of keeping 21:9, so the rows line up without a gap. */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {project.gallery.map((g, i) => (
-              <Reveal key={g + i} delay={i * 0.06}>
+              <Reveal key={g + i} delay={i * 0.06} className={i === 0 ? "relative sm:col-span-2" : ""}>
                 <div
-                  className={`group overflow-hidden rounded-sm border border-line transition-all duration-500 hover:border-gold/30 hover:shadow-[0_8px_40px_rgba(0,0,0,0.5)]${i === 0 ? " sm:col-span-2" : ""}`}
-                  style={{ aspectRatio: i === 0 ? "21/9" : "16/10" }}
+                  className={`group overflow-hidden rounded-sm border border-line transition-all duration-500 hover:border-gold/30 hover:shadow-[0_8px_40px_rgba(0,0,0,0.5)] ${
+                    i === 0 ? "aspect-[21/9] lg:absolute lg:inset-0 lg:aspect-auto" : "aspect-[16/10]"
+                  }`}
                 >
                   <Still
                     src={g}

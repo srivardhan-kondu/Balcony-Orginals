@@ -10,7 +10,6 @@ import { SIZES } from "@/lib/images";
 import { MotionStill } from "@/components/Still";
 import { ProjectionHero } from "@/components/ProjectionHero";
 import { openMenu } from "@/components/Header";
-import { useIsDesktop } from "@/hooks/use-media-query";
 import { Reveal } from "@/components/Motion";
 import { FilmRing } from "@/components/FilmRing";
 import { ScrollFill } from "@/components/ScrollFill";
@@ -22,21 +21,18 @@ import { ReelModal } from "@/components/ReelModal";
 import { StreamingBand } from "@/components/StreamingNow";
 
 /* ---------------------------------------------------------------------------
-   The three WebGL decorations, loaded after the page rather than with it.
+   The two WebGL decorations, loaded after the page rather than with it.
 
-   Between them, `three` is 144KB gzipped — around a third of everything the
-   home page ships, and more than the rest of the home page put together. All
-   three are `aria-hidden` set dressing: a camera turning slowly behind the
-   feature card, a film strip rippling across a band, a projector beam over the
-   gems still. Not one of them carries meaning, none is above the fold, and the
-   camera is gated to desktop.
+   Between them, `three` is a large share of everything the home page ships.
+   Both are `aria-hidden` set dressing: a film strip rippling across a band and
+   a projector beam over the gems still. Neither carries meaning and neither is
+   above the fold.
 
    `ssr: false` because there is nothing for the server to render — each mounts
    a <canvas> and paints into it — and because it keeps three out of the
    prerender entirely. The page arrives, reads and scrolls; the decorations
    catch up.
    --------------------------------------------------------------------------- */
-const CineCamera = dynamic(() => import("@/components/CineCamera").then((m) => m.CineCamera), { ssr: false });
 const ProjectorBeam = dynamic(() => import("@/components/ProjectorBeam").then((m) => m.ProjectorBeam), { ssr: false });
 /* FilmRibbon defers its own canvas — see the note there — so it is imported
    normally and keeps its band in the prerendered HTML. */
@@ -102,9 +98,6 @@ const SectionLink = ({ to, children, testid }) => (
 export default function Home({ initialProjects = [] }) {
   const [projects, setProjects] = useState(initialProjects);
   const [reelOpen, setReelOpen] = useState(false);
-  // The two decorative WebGL scenes are desktop-only. Mounting them behind a
-  // `hidden lg:block` still built the context and ran the loop on phones.
-  const isDesktop = useIsDesktop();
   const gemsRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: gemsRef, offset: ["start end", "end start"] });
   const gemsY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
@@ -226,21 +219,12 @@ export default function Home({ initialProjects = [] }) {
                 </SectionLink>
               </div>
             </Reveal>
-            {/* The camera is anchored to the card, not the section, and set off
-                its top-left corner: still behind the image, but most of it in
-                view. Placed against the section it sat squarely behind the card
-                and could not be seen at all. */}
-            <div className="relative">
-              {isDesktop && (
-                <CineCamera className="pointer-events-none absolute -left-[32%] -top-[40%] z-0 aspect-square w-[66%]" />
-              )}
-              <div className="relative z-[1]">
-                {films.map((p) => (
-                  <Reveal key={p.slug} delay={0.15}>
-                    <ProjectCard project={p} large sizes={SIZES.half} />
-                  </Reveal>
-                ))}
-              </div>
+            <div>
+              {films.map((p) => (
+                <Reveal key={p.slug} delay={0.15}>
+                  <ProjectCard project={p} large sizes={SIZES.half} />
+                </Reveal>
+              ))}
             </div>
           </div>
         </div>

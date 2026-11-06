@@ -8,31 +8,99 @@ import * as THREE from "three";
    taking the band it sits in with it. Nothing here renders on the server: it
    mounts a <canvas> and paints into it. */
 
-const makeStripTexture = () => {
+/* The frames on the strip are stills from Proddatur Dussehra. `fit: "contain"`
+   shows the whole image: the square poster, so its title is never cropped, and
+   the archer still, whose two figures sit at opposite edges. The rest fill
+   their frame. */
+const FRAMES = [
+  { src: "/assets/projects/proddatur-hero-768w.jpg", fit: "contain" },
+  { src: "/assets/projects/proddatur-g7-768w.jpg", fit: "contain" },
+  { src: "/assets/projects/proddatur-g8-768w.jpg", fit: "cover" },
+];
+
+// Strip geometry, kept in one place because the frame maths depends on it.
+const STRIP_W = 17; // world units
+const STRIP_H = 1.7;
+const TEX_W = 3456; // 9 frames, so the 3 stills repeat without two alike side by side
+const TEX_H = 448;
+const PITCH = TEX_W / 9; // one frame plus its gap
+const FRAME = { x: 8, y: 80, w: PITCH - 16, h: 288 };
+const REPEAT = 4096 / TEX_W; // keeps the strip at its original scale on screen
+
+// How wide a frame actually looks once the texture is stretched over the strip.
+const FRAME_ASPECT =
+  (FRAME.w * (STRIP_W / (REPEAT * TEX_W))) / (FRAME.h * (STRIP_H / TEX_H));
+
+const drawStill = (g, img, fit, x) => {
+  const { y, w, h } = FRAME;
+  g.fillStyle = "#050505";
+  g.fillRect(x, y, w, h);
+  const imgAspect = img.naturalWidth / img.naturalHeight;
+  if (fit === "contain") {
+    // Fit the whole image, measured in on-screen proportions.
+    const dh = imgAspect > FRAME_ASPECT ? h * (FRAME_ASPECT / imgAspect) : h;
+    const dw = imgAspect > FRAME_ASPECT ? w : w * (imgAspect / FRAME_ASPECT);
+    g.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  } else {
+    // Crop the centre of the image to the frame's on-screen proportions.
+    let sw = img.naturalWidth;
+    let sh = img.naturalHeight;
+    if (imgAspect > FRAME_ASPECT) sw = sh * FRAME_ASPECT;
+    else sh = sw / FRAME_ASPECT;
+    g.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, x, y, w, h);
+  }
+  // A faint sheen so the stills read as film rather than flat prints.
+  const grd = g.createLinearGradient(x, y, x, y + h);
+  grd.addColorStop(0, "rgba(255,255,255,0.06)");
+  grd.addColorStop(0.5, "rgba(0,0,0,0)");
+  grd.addColorStop(1, "rgba(0,0,0,0.25)");
+  g.fillStyle = grd;
+  g.fillRect(x, y, w, h);
+};
+
+/** Builds the strip; frames start as grey and fill in as each still loads. */
+const makeStripTexture = (onUpdate) => {
   const c = document.createElement("canvas");
-  c.width = 2048;
-  c.height = 224;
+  c.width = TEX_W;
+  c.height = TEX_H;
   const g = c.getContext("2d");
   g.fillStyle = "#0a0a0a";
-  g.fillRect(0, 0, 2048, 224);
+  g.fillRect(0, 0, TEX_W, TEX_H);
   g.fillStyle = "rgba(236,236,235,0.85)";
-  for (let x = 24; x < 2048; x += 64) {
-    g.fillRect(x, 12, 22, 16);
-    g.fillRect(x, 224 - 28, 22, 16);
+  for (let x = 24; x < TEX_W; x += 64) {
+    g.fillRect(x, 24, 22, 32);
+    g.fillRect(x, TEX_H - 56, 22, 32);
   }
-  for (let x = 8; x < 2048; x += 128) {
-    const grd = g.createLinearGradient(x, 0, x + 120, 0);
+  for (let i = 0; i < 9; i++) {
+    const x = i * PITCH + FRAME.x;
+    const grd = g.createLinearGradient(x, 0, x + FRAME.w, 0);
     grd.addColorStop(0, "rgba(236,236,235,0.08)");
     grd.addColorStop(0.5, "rgba(236,236,235,0.22)");
     grd.addColorStop(1, "rgba(236,236,235,0.08)");
     g.fillStyle = grd;
-    g.fillRect(x, 40, 118, 144);
+    g.fillRect(x, FRAME.y, FRAME.w, FRAME.h);
   }
+
   const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
-  tex.repeat.set(2, 1);
+  tex.repeat.set(REPEAT, 1);
   tex.anisotropy = 4;
-  return tex;
+
+  let cancelled = false;
+  FRAMES.forEach(({ src, fit }, k) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => {
+      if (cancelled) return;
+      for (let i = k; i < 9; i += FRAMES.length) drawStill(g, img, fit, i * PITCH + FRAME.x);
+      tex.needsUpdate = true;
+      onUpdate();
+    };
+    img.src = src;
+  });
+
+  return { tex, cancel: () => (cancelled = true) };
 };
 
 export const FilmRibbonCanvas = () => {
@@ -55,8 +123,11 @@ export const FilmRibbonCanvas = () => {
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
     camera.position.set(0, 0.1, 4.4);
 
-    const tex = makeStripTexture();
-    const geo = new THREE.PlaneGeometry(17, 1.7, 150, 1);
+    // With reduced motion there is no loop, so each loaded still needs its own render.
+    const { tex, cancel: cancelStills } = makeStripTexture(() => {
+      if (reduced) renderer.render(scene, camera);
+    });
+    const geo = new THREE.PlaneGeometry(STRIP_W, STRIP_H, 150, 1);
     const base = geo.attributes.position.array.slice();
     const mat = new THREE.MeshBasicMaterial({
       map: tex,
@@ -114,6 +185,7 @@ export const FilmRibbonCanvas = () => {
 
     return () => {
       cancelAnimationFrame(raf);
+      cancelStills();
       io.disconnect();
       window.removeEventListener("resize", resize);
       geo.dispose();

@@ -1,13 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSiteChromeVisible } from "@/hooks/use-past-hero";
 
 export const FootageCounter = () => {
   const ref = useRef(null);
   /* The projection hero has its own readout in the same corner — two footage
      counters printed over each other is worse than either. */
-  const visible = useSiteChromeVisible();
+  const chromeVisible = useSiteChromeVisible();
+  /* It also stands aside at the foot of the page, where the footer's credit
+     line sits in the same corner. */
+  const [atFooter, setAtFooter] = useState(false);
+  const visible = chromeVisible && !atFooter;
+
+  useEffect(() => {
+    const credit = document.querySelector('[data-testid="footer-powered-by"]');
+    if (!credit) return;
+    const io = new IntersectionObserver(([e]) => setAtFooter(e.isIntersecting));
+    io.observe(credit);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     let raf;
